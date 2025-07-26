@@ -1,0 +1,6 @@
+.wave-decoration {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 80'%3E%3Cpath d='M0,40 Q250,15 500,40 T1000,40 L1000,80 L0,80 Z' fill='rgba(0, 199, 190, 0.1)'/%3E%3C/svg%3E");
+    background-size: 1000px 80px;
+    background-repeat: repeat-x;
+    background-position: bottom;
+  }
