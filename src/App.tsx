@@ -4,6 +4,8 @@ import Menu from './page/Menu'
 import Login from './page/Login'
 import AuthLayout from './layout/AuthLayout'
 import Dashboard from './page/Dashboard'
+import MenuDashboard from './page/MenuDashboard'
+import InfoDashboard from './page/InfoDashboard'
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
 
         <Route element={<AuthLayout />}>
           <Route path='/dashboard-admin' element={<Dashboard />} />
+          <Route path='/dashboard-menu' element={<MenuDashboard />} />
+          <Route path='/dashboard-info' element={<InfoDashboard />} />
         </Route>
       </Routes>
     </div>

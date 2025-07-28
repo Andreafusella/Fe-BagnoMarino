@@ -3,7 +3,7 @@ import CardMenuText from "@/components/CardMenuText";
 import CategoryList from "@/components/CategoryList";
 import ItemList from "@/components/ItemList";
 import { useMenu } from "@/context/MenuContext";
-import { getCategories, getCategoryWithSubItems, type ICategory, type ICategoryWithItems } from "@/service/Menuservice";
+import { getCategoriesNotSubCategory, getCategoryWithSubItems, type ICategory, type ICategoryWithItems } from "@/service/Menuservice";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -18,7 +18,7 @@ const MenuAndCategory = () => {
         const fetchCategories = async () => {
             setLoadingCategory(true)
             try {
-                const data = await getCategories();
+                const data = await getCategoriesNotSubCategory();
                 setCategories(data);
             } catch (error) {
                 console.error("Failed to fetch categories:", error);

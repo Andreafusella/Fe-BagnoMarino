@@ -16,7 +16,7 @@ export interface IAllergenes {
 
 export interface IItem {
     id: number;
-    title: string;
+    name: string;
     description: string;
     price: number;
     available: boolean;
@@ -32,7 +32,7 @@ export interface ICategoryWithItems {
     subcategories: ICategoryWithItems[];
 }
 
-export async function getCategories(): Promise<ICategory[]> {
+export async function getCategoriesNotSubCategory(): Promise<ICategory[]> {
     const response = await axios.get<ICategory[]>(`${VITE_BACKEND_URL}/category`);
     return response.data;
 }
@@ -46,6 +46,8 @@ export async function getCategories(): Promise<ICategory[]> {
 
 export async function getCategoryWithSubItems(categoryId: number): Promise<ICategoryWithItems> {
     const response = await axios.get<ICategoryWithItems>(`${VITE_BACKEND_URL}/item/categories/${categoryId}`);
+    console.log(response);
+    
     return response.data;
 }
 

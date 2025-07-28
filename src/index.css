@@ -11,7 +11,7 @@
   --font-size: 14px;
   --font-heading: 'Poppins', sans-serif;
   --font-body: 'Inter', sans-serif;
-  
+
   /* Deliveroo-Inspired Ocean Theme Colors */
   --background: #fafbff;
   --foreground: #1a1d29;
@@ -36,7 +36,7 @@
   --font-weight-medium: 500;
   --font-weight-normal: 400;
   --ring: #00c7be;
-  --radius: 0.25rem;
+  --radius: 0.4rem;
 
   /* Marine Theme Colors */
   --ocean-50: #e0f7fa;
@@ -93,6 +93,14 @@
   --teal-700: #00796b;
   --teal-800: #00695c;
   --teal-900: #004d40;
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
+  --sidebar-primary: hsl(240 5.9% 10%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(240 4.8% 95.9%);
+  --sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
 @theme inline {
@@ -177,6 +185,14 @@
   --color-teal-700: var(--teal-700);
   --color-teal-800: var(--teal-800);
   --color-teal-900: var(--teal-900);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
 }
 
 .dark {
@@ -217,10 +233,6 @@
   :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
     h1 {
       font-family: var(--font-heading);
-      font-size: var(--text-2xl);
-      font-weight: 700;
-      line-height: 1.1;
-      letter-spacing: -0.03em;
     }
 
     h2 {
@@ -443,4 +455,11 @@
   75% {
     color: #009688;
   }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  
 }
