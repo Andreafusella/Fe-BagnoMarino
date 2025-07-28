@@ -1,6 +1,6 @@
 import { AppSidebar } from '@/components/AppSidebar'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useNavigate, Outlet } from 'react-router-dom'
 
 const AuthLayout = () => {

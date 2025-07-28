@@ -19,7 +19,6 @@ import {
     SelectValue,
     SelectContent,
     SelectGroup,
-    SelectLabel,
     SelectItem
 } from '../ui/select'
 import IconPicker from '../IconPicker'

@@ -33,6 +33,8 @@ export interface ICategoryWithItems {
 }
 
 export async function getCategoriesNotSubCategory(): Promise<ICategory[]> {
+    console.log(VITE_BACKEND_URL);
+    
     const response = await axios.get<ICategory[]>(`${VITE_BACKEND_URL}/category`);
     return response.data;
 }

@@ -8,7 +8,7 @@ interface IItemListProps {
 const ItemList = ({ item }: IItemListProps) => {
   return (
     <div>
-      {item.map((item, index) => (
+      {item.map((item) => (
         <div key={item.id} className="my-4">
             <ItemCard item={item} />
 

@@ -1,4 +1,4 @@
-import { Fish, Sparkles, Pizza, ChefHat, Shell, ShipWheel } from "lucide-react"
+import { Fish, Pizza, ChefHat, Shell, ShipWheel } from "lucide-react"
 
 interface IHeaderMenuSecondProps {
     title: string;
@@ -6,7 +6,7 @@ interface IHeaderMenuSecondProps {
 }
 
 
-const HeaderMenuSecond = ({ title, descritpion }: IHeaderMenuSecondProps) => {
+const HeaderMenuSecond = ({ title }: IHeaderMenuSecondProps) => {
     return (
         <section className="relative py-12 lg:py-14 overflow-hidden">
             <div className="wave-decoration absolute bottom-0 left-0 w-full h-20"></div>

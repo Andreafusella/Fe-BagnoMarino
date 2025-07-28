@@ -1,6 +1,5 @@
 import { getLucideIconByName } from "@/service/GeneralService";
 import type { ICategory } from "@/service/Menuservice"
-import { Icon, Badge } from "lucide-react"
 
 interface ICardHeaderItemListProps {
     category: ICategory | null;
@@ -14,7 +13,7 @@ const CardHeaderItemList = ({ category, numberPlate }: ICardHeaderItemListProps)
         <div className="flex justify-center pt-10">
             <div
                 className="inline-flex items-center gap-3 lg:gap-4 rounded-xl lg:rounded-2xl px-6 lg:px-8 py-4 lg:py-5 shadow-deliveroo mx-auto border border-solid border-[#f2e8cf] bg-[#fef6e4]">
-                {/* Icona */}
+                
                 <div
                     className="p-2 lg:p-3 rounded-xl shadow-lg"
                     style={{

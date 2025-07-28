@@ -20,6 +20,8 @@ const MenuAndCategory = () => {
             try {
                 const data = await getCategoriesNotSubCategory();
                 setCategories(data);
+                console.log(data);
+                
             } catch (error) {
                 console.error("Failed to fetch categories:", error);
             } finally {

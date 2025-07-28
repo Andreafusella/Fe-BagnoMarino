@@ -9,7 +9,7 @@ interface ICategoryCardProps {
   onClick: () => void;
 };
 
-function CategoryCard({ title, icon, numberPlate, selected, onClick, iconColor }: ICategoryCardProps) {
+function CategoryCard({ title, icon, selected, onClick, iconColor }: ICategoryCardProps) {
   const IconComponent = getLucideIconByName(icon);
 
   return (

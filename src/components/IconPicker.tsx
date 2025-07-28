@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
 import { ICONS } from "@/service/DashboardService"
 
 const COLORS = [
@@ -23,7 +22,7 @@ interface IconPickerProps {
 }
 
 const IconPicker = ({ selectedIcon, onChange }: IconPickerProps) => {
-    // Mappa colori
+
     const [iconColorMap] = useState(() => {
         const map = new Map<string, string>()
         ICONS.forEach(({ name }) => {
