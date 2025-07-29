@@ -25,13 +25,14 @@ import IconPicker from '../IconPicker'
 import z from 'zod'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useCreateCategory, useGetAllCategory, type INewCategory } from '@/service/DashboardService'
+import { useCreateCategory, type INewCategory } from '@/service/DashboardService'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner';
-import ToastComponent from '../ToastComponent'
 import { useQueryClient } from '@tanstack/react-query'
 
 interface INewCategoryDialogProps {
+    categories: ICategory[];
+    onCategoryCreated?: () => void;
 }
 
 const categorySchema = z.object({
@@ -43,10 +44,10 @@ const categorySchema = z.object({
 
 type CategoryFormData = z.infer<typeof categorySchema>
 
-const NewCategoryDialog = () => {
+const NewCategoryDialog = ({categories, onCategoryCreated} : INewCategoryDialogProps) => {
     const [open, setOpen] = useState(false)
 
-    const { data: categories = []} = useGetAllCategory()
+    // const { data: categories = []} = useGetAllCategory()
 
     const { mutate } = useCreateCategory();
 
@@ -81,14 +82,14 @@ const NewCategoryDialog = () => {
 
         mutate(body, {
             onSuccess: () => {
-                console.log("ENtcndsvuondsivsvnsdvusv");
                 
                 toast.success(`Categoria ${body.name} creata con successo`, {style: { backgroundColor: "#22c55e", color: "white" }})
                 setOpen(false)
                 queryClient.invalidateQueries({queryKey: ['category-all']})
+                onCategoryCreated?.();
             },
             onError: () => {
-                ToastComponent({ type: 'success', message: `Errore creazione Categoria` });
+                toast.error(`Errore creazione Categoria`, {style: { backgroundColor: "red", color: "white" }})
             }
         })
 

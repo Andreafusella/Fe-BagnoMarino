@@ -23,6 +23,18 @@ export const createAuthInstance = (token: string | null) => {
     delete authInstance.defaults.headers.common['Authorization'];
   }
 
+  authInstance.interceptors.response.use(
+    response => response,
+    error => {
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        console.warn('Token non valido o scaduto, reindirizzo al login...');
+        localStorage.removeItem('token');
+        window.location.replace('/login');
+      }
+      return Promise.reject(error);
+    }
+  );
+
   return authInstance;
 };
 

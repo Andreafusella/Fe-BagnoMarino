@@ -1,6 +1,5 @@
-import axios from "axios";
-
-const { VITE_BACKEND_URL } = import.meta.env;
+import { createAuthInstance } from "@/api/axiosInstance";
+import { useQuery } from "@tanstack/react-query";
 
 export interface ICategory {
     id: number;
@@ -20,6 +19,8 @@ export interface IItem {
     description: string;
     price: number;
     available: boolean;
+    special: boolean;
+    frozen: boolean;
     categoryName: string;
     allergenes: IAllergenes[];
 }
@@ -32,24 +33,42 @@ export interface ICategoryWithItems {
     subcategories: ICategoryWithItems[];
 }
 
-export async function getCategoriesNotSubCategory(): Promise<ICategory[]> {
-    console.log(VITE_BACKEND_URL);
-    
-    const response = await axios.get<ICategory[]>(`${VITE_BACKEND_URL}/category`);
-    return response.data;
+const getCategoriesNotSubCategory = async (): Promise<ICategory[]> => {
+    const authAxios = createAuthInstance(null);
+    const response = await authAxios.get<ICategory[]>('/category')
+    return response.data
 }
 
-// export async function getItemsByCategory(categoryId: number): Promise<IItem[]> {
-//     const response = await axios.get<IItem[]>(`${VITE_BACKEND_URL}/item/category?category=${categoryId}`);
-//     console.log(response.data);
+export const useGetCategoriesNotSubCategory = () => {
+    return useQuery({
+        queryKey: ['category-not-sub'],
+        queryFn: async () => {
+            return getCategoriesNotSubCategory()
+        }
+    })
+}
 
+const getCategoryWithSubItems = async (categoryId: number): Promise<ICategoryWithItems> => {
+    const authAxios = createAuthInstance(null)
+    const response = await authAxios.get<ICategoryWithItems>(`/item/categories/${categoryId}`)
+    return response.data
+}
+
+export const useGetCategoryWithSubItems = (categoryId: number | null) => {
+    return useQuery({
+      queryKey: ['category-tree', categoryId],
+      queryFn: async () => {
+        if (categoryId === null) throw new Error('No category selected');
+        return getCategoryWithSubItems(categoryId);
+      },
+      enabled: !!categoryId,
+    });
+  };
+
+// export async function getCategoryWithSubItems(categoryId: number): Promise<ICategoryWithItems> {
+//     const response = await axios.get<ICategoryWithItems>(`${VITE_BACKEND_URL}/item/categories/${categoryId}`);
+//     console.log(response);
+    
 //     return response.data;
 // }
-
-export async function getCategoryWithSubItems(categoryId: number): Promise<ICategoryWithItems> {
-    const response = await axios.get<ICategoryWithItems>(`${VITE_BACKEND_URL}/item/categories/${categoryId}`);
-    console.log(response);
-    
-    return response.data;
-}
 

@@ -1,5 +1,7 @@
 import type { IItem } from "@/service/Menuservice";
 import Allergen from "./Allergen";
+import SpecialCard from "./SpecialCard";
+import FrozenCard from "./FrozenCard";
 
 interface ItemCardProps {
   item: IItem;
@@ -11,7 +13,11 @@ function ItemCard({ item }: ItemCardProps) {
       {/* Top section */}
       <div className="flex justify-between items-start gap-4">
         <div className="space-y-2 sm:space-y-3 max-w-[75%]">
-          <h3 className="text-xl sm:text-2xl font-semibold">{item.name}</h3>
+          <div className="flex gap-2">
+            <h3 className="text-xl sm:text-2xl font-semibold">{item.name}</h3>
+            {item.special && <SpecialCard></SpecialCard>}
+            {item.frozen && <FrozenCard></FrozenCard>}
+          </div>
           <p className="text-sm sm:text-[15px] text-gray-600">{item.description}</p>
         </div>
         <p className="text-2xl sm:text-3xl font-bold text-cyan-800 font-poppins whitespace-nowrap">

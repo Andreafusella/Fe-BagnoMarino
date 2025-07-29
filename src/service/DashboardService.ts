@@ -6,6 +6,145 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const { VITE_BACKEND_URL } = import.meta.env
 
+
+export interface INumberPlateAndCategory {
+    category: number;
+    itemAvailable: number;
+    itemNotAvailable: number;
+}
+
+export interface INewCategory {
+    name: string;
+    icon: string;
+    orderIndex: number;
+    subCategoryId: number
+}
+
+export interface INewItem {
+    name: string;
+    description?: string;
+    price: number;
+    category: number;
+    available: boolean;
+    special: boolean;
+    frozen: boolean;
+    orderIndex?: number | null;
+    allergensIds: number[];
+}
+
+export interface IItemDto {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    available: boolean;
+    categoryName: string;
+    allergenes: IAllergenesDto[];
+}
+
+export interface IAllergenesDto {
+    id: number;
+    symbol: string;
+    name: string;
+    description: string;
+}
+
+export async function getInfoPlateAndCategory(): Promise<INumberPlateAndCategory> {
+    const response = await axios.get<INumberPlateAndCategory>(`${VITE_BACKEND_URL}/restaurant`);
+    return response.data;
+}
+
+const getAllergenesAdmin = async (token : string): Promise<IAllergenesDto[]> => {
+    const authAxios = createAuthInstance(token);
+    const response = await authAxios.get<IAllergenesDto[]>('/allergens/admin')
+    return response.data;
+}
+
+export const useGetAllergenesAdmin = () => {
+    const token = localStorage.getItem("token");
+
+    return useQuery({
+        queryKey: ['allergens-admin'],
+        queryFn: async () => {
+            if (!token) {
+                throw new Error('No token available for fetching allergens-admin')
+            }
+            return getAllergenesAdmin(token)
+        }
+    })
+}
+
+const getAllCategory = async (token : string): Promise<ICategory[]> => {
+    const authAxios = createAuthInstance(token);
+    const response = await authAxios.get<ICategory[]>('/category/all')
+    return response.data;
+}
+
+export const useGetAllCategory = () => {
+    const token = localStorage.getItem("token");
+
+    return useQuery({
+        queryKey: ['category-all'],
+        queryFn: async () => {
+            if (!token) {
+                throw new Error('No token available for fetching category-all')
+            }
+            return getAllCategory(token);
+        }
+    })
+}
+
+const createCategory = async (token: string, data: INewCategory): Promise<void> => {
+    const authAxios = createAuthInstance(token);
+    await authAxios.post('/category', data);
+}
+
+export const useCreateCategory = () => {
+    const token = localStorage.getItem("token");
+    
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationKey: ['create-category'],
+        mutationFn: async (data: INewCategory) => {
+            if (!token) {
+                throw new Error('No token available for fetching category-create')
+            }
+            return createCategory(token, data)
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['category-all']})
+        }
+    })
+}
+
+const createItem = async (token: string, data: INewItem): Promise<IItemDto> => {
+    const authAxios = createAuthInstance(token);
+    const response = await authAxios.post<IItemDto>('/item', data);
+    return response.data;
+}
+
+export const useCreateItem = () => {
+    const token = localStorage.getItem("token");
+    
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationKey: ['create-item'],
+        mutationFn: async (data: INewItem) => {
+            if (!token) {
+                throw new Error('No token available for fetching create-item')
+            }
+            return createItem(token, data)
+        },
+        onSuccess: () => {
+            // invalidare query per la get di tutti gli item
+            // queryClient.invalidateQueries({queryKey: ['category-all']})
+        }
+    })
+}
+
+
 export const ICONS = [
     { name: "Pizza", icon: Pizza },
     { name: "IceCream", icon: IceCream },
@@ -44,119 +183,3 @@ export const ICONS = [
     { name: "Citrus", icon: Citrus },
     { name: "Donut", icon: Donut },
 ]
-
-export interface INumberPlateAndCategory {
-    category: number;
-    itemAvailable: number;
-    itemNotAvailable: number;
-}
-
-export interface INewCategory {
-    name: string;
-    icon: string;
-    orderIndex: number;
-    subCategoryId: number
-}
-
-export interface INewItem {
-    name: string;
-    description?: string;
-    price: number;
-    category: number;
-    available: boolean;
-    special: boolean;
-    congelato: boolean;
-    orderIndex?: number | null;
-    allergensIds: number[];
-}
-
-export interface IAllergenesDto {
-    id: number;
-    symbol: string;
-    name: string;
-    description: string;
-}
-
-export async function getInfoPlateAndCategory(): Promise<INumberPlateAndCategory> {
-    const response = await axios.get<INumberPlateAndCategory>(`${VITE_BACKEND_URL}/restaurant`);
-    return response.data;
-}
-
-export async function getAllergenesAdmin() {
-    const token = localStorage.getItem("token");
-
-    const response = await axios.get<IAllergenesDto[]>(`${VITE_BACKEND_URL}/allergens/admin`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        }
-    });
-
-    return response;
-}
-
-const getAllCategory = async (token : string): Promise<ICategory[]> => {
-    const authAxios = createAuthInstance(token);
-    const response = await authAxios.get<ICategory[]>('/category/all')
-    return response.data;
-}
-
-export const useGetAllCategory = () => {
-    const token = localStorage.getItem("token");
-
-    return useQuery({
-        queryKey: ['category-all'],
-        queryFn: async () => {
-            if (!token) {
-                throw new Error('No token available for fetching category-all')
-            }
-            return getAllCategory(token);
-        }
-    })
-}
-
-const createCategory = async (token: string, data: INewCategory): Promise<void> => {
-    const authAxios = createAuthInstance(token);
-    await authAxios.post('/category', data);
-}
-
-export const useCreateCategory = () => {
-    const token = localStorage.getItem("token");
-    
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: async (data: INewCategory) => {
-            if (!token) {
-                throw new Error('No token available for fetching category-create')
-            }
-            return createCategory(token, data)
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['category-all']})
-        }
-    })
-}
-
-// export async function createCategory(data: INewCategory) {
-//     const token = localStorage.getItem("token");
-
-//     const response = await axios.post(`${VITE_BACKEND_URL}/category`, data, {
-//         headers: {
-//             Authorization: `Bearer ${token}`,
-//         }
-//     });
-
-//     return response;
-// }
-
-export async function createItem(data: INewItem) {
-    const token = localStorage.getItem("token");
-
-    const response = await axios.post(`${VITE_BACKEND_URL}/item`, data, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        }
-    });
-
-    return response;
-}

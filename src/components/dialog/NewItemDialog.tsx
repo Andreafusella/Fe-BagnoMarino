@@ -1,6 +1,6 @@
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog'
 import { Button } from '../ui/button'
-import { createItem, type IAllergenesDto, type INewItem } from '@/service/DashboardService'
+import { useCreateItem, type IAllergenesDto, type INewItem } from '@/service/DashboardService'
 import type { ICategory } from '@/service/Menuservice'
 import { Textarea } from '../ui/textarea'
 import { Label } from '../ui/label'
@@ -13,11 +13,13 @@ import z from 'zod'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 interface INewItemDialogProps {
-    allergenes: IAllergenesDto[]
-    categories: ICategory[]
+    allergenes: IAllergenesDto[];
+    categories: ICategory[];
+    onCategoryCreated?: () => void;
 }
 
 const productSchema = z.object({
@@ -29,7 +31,7 @@ const productSchema = z.object({
     orderIndex: z.number().gt(0, "La posizione deve essere maggiore di 0").optional(),
     available: z.boolean(),
     special: z.boolean(),
-    congelato: z.boolean()
+    frozen: z.boolean()
 })
 
 type ProductFormData = z.infer<typeof productSchema>
@@ -40,8 +42,8 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
     const [selectValue, setSelectValue] = useState<string>("")
     const [open, setOpen] = useState(false)
 
-    const navigate = useNavigate();
-
+    const { mutate } = useCreateItem();
+    
 
     const {
         register,
@@ -61,7 +63,7 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
             allergenes: [],
             available: false,
             special: false,
-            congelato: false,
+            frozen: false,
         }
     })
 
@@ -93,12 +95,13 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                 allergenes: [],
                 available: false,
                 special: false,
-                congelato: false,
+                frozen: false,
             })
             setSelectedAllergenes([])
             setSelectValue("")
         }
     }
+
 
     const onSubmit = async (data: ProductFormData) => {
         const payload : INewItem = {
@@ -106,21 +109,14 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
             allergensIds: selectedAllergenes.map(a => a.id),
             orderIndex: data.orderIndex ?? null
         }
-        console.log(payload);
-        try {
-            const response = await createItem(payload)
-
-            if (response.status === 201 || response.status === 200) {
-                console.log("item creato")
+        
+        mutate(payload, {
+            onSuccess: () => {
+                toast.success(`Item ${payload.name} creato con successo`, {style: { backgroundColor: "#22c55e", color: "white" }})
                 setOpen(false)
+
             }
-        } catch (error: any) {
-            if (axios.isAxiosError(error) && error.response?.status === 403 || error.response?.status === 401) {
-                navigate("/login")
-            } else {
-                console.log("Errore generico", error)
-            }
-        }
+        })
     }
 
 
@@ -229,7 +225,6 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                             render={({ field }) => (
                                 <>
                                     <Select value={selectValue} onValueChange={(val) => {
-                                        // Non resettare selectValue qui, viene resettato in handleAddAllergene/handleRemoveAllergene
                                         const id = Number(val)
                                         if (!field.value?.includes(id)) {
                                             field.onChange([...field.value || [], id])
@@ -312,7 +307,7 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
 
                         <Controller
                             control={control}
-                            name="congelato"
+                            name="frozen"
                             render={({ field }) => (
                                 <div className='flex items-center space-x-2'>
                                     <Switch
