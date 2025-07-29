@@ -25,12 +25,13 @@ import IconPicker from '../IconPicker'
 import z from 'zod'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createCategory, type INewCategory } from '@/service/DashboardService'
+import { useCreateCategory, useGetAllCategory, type INewCategory } from '@/service/DashboardService'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { toast } from 'sonner';
+import ToastComponent from '../ToastComponent'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface INewCategoryDialogProps {
-    categories: ICategory[]
 }
 
 const categorySchema = z.object({
@@ -42,8 +43,12 @@ const categorySchema = z.object({
 
 type CategoryFormData = z.infer<typeof categorySchema>
 
-const NewCategoryDialog = ({ categories }: INewCategoryDialogProps) => {
+const NewCategoryDialog = () => {
     const [open, setOpen] = useState(false)
+
+    const { data: categories = []} = useGetAllCategory()
+
+    const { mutate } = useCreateCategory();
 
     const {
         register,
@@ -61,8 +66,9 @@ const NewCategoryDialog = ({ categories }: INewCategoryDialogProps) => {
             orderIndex: undefined
         }
     })
-
+    
     const navigate = useNavigate()
+    const queryClient = useQueryClient();
 
     const onSubmit = async (data: CategoryFormData) => {
         const body: INewCategory = {
@@ -72,22 +78,36 @@ const NewCategoryDialog = ({ categories }: INewCategoryDialogProps) => {
             subCategoryId: data.subCategoryId ?? -1
         }
 
-        try {
-            console.log(body);
-            
-            const response = await createCategory(body)
 
-            if (response.status === 201 || response.status === 200) {
-                console.log("Categoria creata")
-                setOpen(false) 
+        mutate(body, {
+            onSuccess: () => {
+                console.log("ENtcndsvuondsivsvnsdvusv");
+                
+                toast.success(`Categoria ${body.name} creata con successo`, {style: { backgroundColor: "#22c55e", color: "white" }})
+                setOpen(false)
+                queryClient.invalidateQueries({queryKey: ['category-all']})
+            },
+            onError: () => {
+                ToastComponent({ type: 'success', message: `Errore creazione Categoria` });
             }
-        } catch (error: any) {
-            if (axios.isAxiosError(error) && error.response?.status === 403 || error.response?.status === 401) {
-                navigate("/login")
-            } else {
-                console.log("Errore generico", error)
-            }
-        }
+        })
+
+        // try {
+        //     console.log(body);
+
+        //     const response = await createCategory(body)
+
+        //     if (response.status === 201 || response.status === 200) {
+        //         console.log("Categoria creata")
+        //         setOpen(false) 
+        //     }
+        // } catch (error: any) {
+        //     if (axios.isAxiosError(error) && error.response?.status === 403 || error.response?.status === 401) {
+        //         navigate("/login")
+        //     } else {
+        //         console.log("Errore generico", error)
+        //     }
+        // }
     }
 
     const handleOpenChange = (isOpen: boolean) => {
@@ -122,7 +142,7 @@ const NewCategoryDialog = ({ categories }: INewCategoryDialogProps) => {
                                 type="text"
                                 placeholder="Nome categoria"
                                 autoComplete="off"
-                                
+
                                 className={`border ${errors.name ? 'border-red-500' : 'border-gray-400'} w-full`}
                             />
                         </div>

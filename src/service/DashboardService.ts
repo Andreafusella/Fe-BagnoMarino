@@ -1,6 +1,8 @@
 import axios from "axios";
 import { Pizza, IceCream, Drumstick, Soup, Cake, Apple, Sandwich, Fish, Hamburger, Shrimp, Beef, Utensils, Coffee, Egg, Martini, Milk, CakeSlice, Amphora, HandPlatter, IceCreamBowl, Grape, IceCreamCone, Beer, Ham, Popsicle, Cookie, Croissant, Dessert, Lollipop, Salad, EggFried, Vegan, CupSoda, Refrigerator, Citrus, Donut } from "lucide-react";
 import type { ICategory } from "./Menuservice";
+import { createAuthInstance } from "@/api/axiosInstance";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const { VITE_BACKEND_URL } = import.meta.env
 
@@ -92,29 +94,60 @@ export async function getAllergenesAdmin() {
     return response;
 }
 
-export async function getAllCategory() {
-    const token = localStorage.getItem("token");
-
-    const response = await axios.get<ICategory[]>(`${VITE_BACKEND_URL}/category/all`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        }
-    });
-
-    return response;
+const getAllCategory = async (token : string): Promise<ICategory[]> => {
+    const authAxios = createAuthInstance(token);
+    const response = await authAxios.get<ICategory[]>('/category/all')
+    return response.data;
 }
 
-export async function createCategory(data: INewCategory) {
+export const useGetAllCategory = () => {
     const token = localStorage.getItem("token");
 
-    const response = await axios.post(`${VITE_BACKEND_URL}/category`, data, {
-        headers: {
-            Authorization: `Bearer ${token}`,
+    return useQuery({
+        queryKey: ['category-all'],
+        queryFn: async () => {
+            if (!token) {
+                throw new Error('No token available for fetching category-all')
+            }
+            return getAllCategory(token);
         }
-    });
-
-    return response;
+    })
 }
+
+const createCategory = async (token: string, data: INewCategory): Promise<void> => {
+    const authAxios = createAuthInstance(token);
+    await authAxios.post('/category', data);
+}
+
+export const useCreateCategory = () => {
+    const token = localStorage.getItem("token");
+    
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (data: INewCategory) => {
+            if (!token) {
+                throw new Error('No token available for fetching category-create')
+            }
+            return createCategory(token, data)
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['category-all']})
+        }
+    })
+}
+
+// export async function createCategory(data: INewCategory) {
+//     const token = localStorage.getItem("token");
+
+//     const response = await axios.post(`${VITE_BACKEND_URL}/category`, data, {
+//         headers: {
+//             Authorization: `Bearer ${token}`,
+//         }
+//     });
+
+//     return response;
+// }
 
 export async function createItem(data: INewItem) {
     const token = localStorage.getItem("token");

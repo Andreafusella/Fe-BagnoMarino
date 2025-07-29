@@ -1,6 +1,6 @@
 import NewCategoryDialog from "@/components/dialog/NewCategoryDialog"
 import NewItemDialog from "@/components/dialog/NewItemDialog"
-import { getAllergenesAdmin, getAllCategory, type IAllergenesDto } from "@/service/DashboardService"
+import { getAllergenesAdmin, useGetAllCategory, type IAllergenesDto } from "@/service/DashboardService"
 import { getCategoriesNotSubCategory, type ICategory } from "@/service/Menuservice"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -35,23 +35,23 @@ const MenuDashboard = () => {
                 }
             }
         }
-        const fetchCategories = async () => {
-            try {
-                const data = await getAllCategory();
-                setAllCategories(data.data);
-            } catch (error: any) {
-                if (error.response?.status === 401 || error.response?.status === 403) {
-                    navigate("/login");
-                } else {
-                    console.log("Errore generico", error);
-                }
-            }
-        }
+        // const fetchCategories = async () => {
+        //     try {
+        //         const data = await getAllCategory();
+        //         setAllCategories(data.data);
+        //     } catch (error: any) {
+        //         if (error.response?.status === 401 || error.response?.status === 403) {
+        //             navigate("/login");
+        //         } else {
+        //             console.log("Errore generico", error);
+        //         }
+        //     }
+        // }
 
 
 
         fetchCategoriesNotSubCategory()
-        fetchCategories()
+        // fetchCategories()
         fetchAllergenes()
     }, [])
 
@@ -61,8 +61,8 @@ const MenuDashboard = () => {
                 <div className="w-full flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Gestione Menu</h1>
                     <div className="flex gap-2">
-                        <NewCategoryDialog categories={categoriesNotSubCategory}></NewCategoryDialog>
-                        <NewItemDialog allergenes={allergenes} categories={allCategories}></NewItemDialog>
+                        <NewCategoryDialog></NewCategoryDialog>
+                        {/* <NewItemDialog allergenes={allergenes} categories={categories}></NewItemDialog> */}
                     </div>
                 </div>
             </div>
