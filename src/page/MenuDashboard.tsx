@@ -1,11 +1,12 @@
 import NewCategoryDialog from "@/components/dialog/NewCategoryDialog"
 import NewItemDialog from "@/components/dialog/NewItemDialog"
+import ItemListDashboard from "@/componentsPlus/ItemListDashboard";
 import { useGetAllCategory, useGetAllergenesAdmin } from "@/service/DashboardService"
 
 const MenuDashboard = () => {
 
     const { data: categories = [], refetch } = useGetAllCategory();
-    const { data: allergenes = []} = useGetAllergenesAdmin()
+    const { data: allergenes = []} = useGetAllergenesAdmin();
 
     return (
         <>
@@ -17,6 +18,9 @@ const MenuDashboard = () => {
                         <NewItemDialog allergenes={allergenes} categories={categories} onCategoryCreated={refetch}></NewItemDialog>
                     </div>
                 </div>
+            </div>
+            <div className="px-5">
+                <ItemListDashboard/>
             </div>
         </>
     )

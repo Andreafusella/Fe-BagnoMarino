@@ -6,13 +6,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const { VITE_BACKEND_URL } = import.meta.env
 
-
-export interface INumberPlateAndCategory {
-    category: number;
-    itemAvailable: number;
-    itemNotAvailable: number;
-}
-
 export interface INewCategory {
     name: string;
     icon: string;
@@ -37,9 +30,19 @@ export interface IItemDto {
     name: string;
     description: string;
     price: number;
+    orderIndex: number;
     available: boolean;
+    special: boolean;
+    frozen: boolean;
     categoryName: string;
     allergenes: IAllergenesDto[];
+}
+
+export interface IItemWithCategoryDto {
+    categoryId: number;
+    category: string;
+    categoryIcon: string;
+    items: IItemDto[];
 }
 
 export interface IAllergenesDto {
@@ -49,9 +52,24 @@ export interface IAllergenesDto {
     description: string;
 }
 
-export async function getInfoPlateAndCategory(): Promise<INumberPlateAndCategory> {
-    const response = await axios.get<INumberPlateAndCategory>(`${VITE_BACKEND_URL}/restaurant`);
-    return response.data;
+const getItemWithCategory = async (token : string): Promise<IItemWithCategoryDto[]> => {
+    const authAxios = createAuthInstance(token);
+    const response = await authAxios.get<IItemWithCategoryDto[]>('/item')
+    return response.data; 
+}
+
+export const useGetItemWithCategory = () => {
+    const token = localStorage.getItem("token");
+
+    return useQuery({
+        queryKey: ['item-category-all'],
+        queryFn: async () => {
+            if (!token) {
+                throw new Error('No token available for fetching item-category-all')
+            }
+            return getItemWithCategory(token)
+        }
+    })
 }
 
 const getAllergenesAdmin = async (token : string): Promise<IAllergenesDto[]> => {
@@ -114,6 +132,7 @@ export const useCreateCategory = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['category-all']})
+            queryClient.invalidateQueries({queryKey: ['item-category-all']})
         }
     })
 }
@@ -138,8 +157,7 @@ export const useCreateItem = () => {
             return createItem(token, data)
         },
         onSuccess: () => {
-            // invalidare query per la get di tutti gli item
-            // queryClient.invalidateQueries({queryKey: ['category-all']})
+            queryClient.invalidateQueries({queryKey: ['item-category-all']})
         }
     })
 }

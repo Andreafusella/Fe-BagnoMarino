@@ -2,6 +2,7 @@ import type { ICategory } from "@/service/Menuservice"
 import CategoryCard from "./CategoryCard"
 import { useMenu } from "@/context/MenuContext";
 import { useMemo } from "react";
+import { useDraggableScroll } from "@/hooks/useDraggableScroll";
 
 interface ICategoryListProps {
     categories: ICategory[]
@@ -24,6 +25,8 @@ const CategoryList = ({ categories }: ICategoryListProps) => {
 
     const { setSelectedCategory, selectedCategory } = useMenu();
 
+    const { ref } = useDraggableScroll<HTMLDivElement>();
+
     const handleCategoryClick = (category: ICategory) => {
         setSelectedCategory(category);
     };
@@ -40,7 +43,7 @@ const CategoryList = ({ categories }: ICategoryListProps) => {
     return (
         <div className="mb-2 lg:mb-4">
             <div className="mx-4 lg:mx-8 px-4 lg:px-6 pt-10 pb-0 lg:pt-12 lg:pb-6">
-                <div className="overflow-x-auto py-6 lg:pb-6 no-scrollbar">
+                <div ref={ref} className="overflow-x-auto py-6 lg:pb-6 no-scrollbar">
                     <div className="flex gap-4 lg:gap-5 min-w-max px-6 lg:px-12">
                         {categories.map((category, index) => (
                             <CategoryCard
@@ -61,3 +64,4 @@ const CategoryList = ({ categories }: ICategoryListProps) => {
 }
 
 export default CategoryList
+
