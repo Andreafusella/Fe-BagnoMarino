@@ -9,7 +9,7 @@ const { VITE_BACKEND_URL } = import.meta.env
 export interface INewCategory {
     name: string;
     icon: string;
-    orderIndex: number;
+    orderIndex?: number | null;
     subCategoryId: number
 }
 

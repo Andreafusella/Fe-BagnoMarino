@@ -12,8 +12,6 @@ import Allergen from '../Allergen'
 import z from 'zod'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigate } from 'react-router-dom'
-import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 interface INewItemDialogProps {
@@ -24,11 +22,30 @@ interface INewItemDialogProps {
 
 const productSchema = z.object({
     name: z.string().min(1, "Il nome è obbligatorio").max(30, "Massimo 30 caratteri"),
-    price: z.number().gt(0, "Il prezzo deve essere maggiore di 0"),
+    price: z.preprocess(
+        (val) => {
+            // Gestisce stringhe vuote, undefined, null o NaN per il prezzo
+            if (val === "" || val === undefined || val === null || (typeof val === 'number' && isNaN(val))) {
+                return undefined;
+            }
+            return Number(val);
+        },
+        z.number().gt(0, "Il prezzo deve essere maggiore di 0")
+    ),
     category: z.number().min(1, "La categoria è obbligatoria"),
     description: z.string().max(40, "Massimo 40 caratteri").optional(),
     allergenes: z.array(z.number()).optional(),
-    orderIndex: z.number().gt(0, "La posizione deve essere maggiore di 0").optional(),
+    orderIndex: z.preprocess(
+        (val) => {
+            // Se il valore è una stringa vuota, undefined, null o NaN, restituisce null
+            if (val === "" || val === undefined || val === null || (typeof val === 'number' && isNaN(val))) {
+                return null;
+            }
+            // Altrimenti prova a convertire in numero
+            return Number(val);
+        },
+        z.number().gt(0, "La posizione deve essere maggiore di 0").nullable()
+    ),
     available: z.boolean(),
     special: z.boolean(),
     frozen: z.boolean()
@@ -51,15 +68,15 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
         control,
         reset,
         formState: { errors, isSubmitting, isValid }
-    } = useForm<ProductFormData>({
+    } = useForm({
         resolver: zodResolver(productSchema),
-        mode: 'all',
+        mode: 'all' as const,
         defaultValues: {
             name: '',
             price: undefined,
             category: undefined,
             description: '',
-            orderIndex: undefined,
+            orderIndex: null,
             allergenes: [],
             available: false,
             special: false,
@@ -91,7 +108,7 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                 price: undefined,
                 category: undefined,
                 description: '',
-                orderIndex: undefined,
+                orderIndex: null,
                 allergenes: [],
                 available: false,
                 special: false,
@@ -107,7 +124,7 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
         const payload : INewItem = {
             ...data,
             allergensIds: selectedAllergenes.map(a => a.id),
-            orderIndex: data.orderIndex ?? null
+            orderIndex: data.orderIndex
         }
         
         mutate(payload, {
@@ -142,6 +159,7 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                             className={`border ${errors.name ? 'border-red-500' : 'border-gray-400'} w-full`}
                             {...register("name")}
                         />
+                        {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
                     </div>
 
                     {/* Categoria + Prezzo */}
@@ -157,7 +175,7 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                                         onValueChange={(val) => field.onChange(Number(val))}
                                         value={field.value?.toString() || ""}
                                     >
-                                        <SelectTrigger className="border border-gray-400 w-full mb-0">
+                                        <SelectTrigger className={`border ${errors.category ? 'border-red-500' : 'border-gray-400'} w-full mb-0`}>
                                             <SelectValue placeholder="Seleziona una categoria" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -172,26 +190,21 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                                     </Select>
                                 )}
                             />
+                            {errors.category && <p className="text-red-500 text-sm">{errors.category.message}</p>}
                         </div>
 
                         {/* Prezzo */}
                         <div className='space-y-2 flex-1'>
                             <Label>Prezzo<span className='text-red-400'>*</span></Label>
-                            <Controller
-                                control={control}
-                                name="price"
-                                render={({ field }) => (
-                                    <Input
-                                        type="number"
-                                        placeholder="9,99"
-                                        step="1.00"
-                                        autoComplete='off'
-                                        className={`border ${errors.name ? 'border-red-500' : 'border-gray-400'} w-full`}
-                                        {...field}
-                                        onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                                    />
-                                )}
+                            <Input
+                                type="number"
+                                placeholder="9,99"
+                                step="0.01"
+                                autoComplete='off'
+                                className={`border ${errors.price ? 'border-red-500' : 'border-gray-400'} w-full`}
+                                {...register("price")}
                             />
+                            {errors.price && <p className="text-red-500 text-sm">{errors.price.message}</p>}
                         </div>
                     </div>
 
@@ -199,21 +212,23 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                     <div className='space-y-2'>
                         <Label>Descrizione</Label>
                         <Textarea
-                            className='border border-gray-400 w-full'
+                            className={`border ${errors.description ? 'border-red-500' : 'border-gray-400'} w-full`}
                             placeholder='Descrizione'
                             {...register("description")}
                         />
+                        {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
                     </div>
 
                     <div className="space-y-2">
                         <Label>Posizione</Label>
                         <Input
-                            {...register('orderIndex', { valueAsNumber: true })}
+                            {...register('orderIndex')}
                             type='number'
                             autoComplete="off"
                             placeholder='1-2-3...'
                             className={`border ${errors.orderIndex ? 'border-red-500' : 'border-gray-400'} w-full`}
                         />
+                        {errors.orderIndex && <p className="text-red-500 text-sm">{errors.orderIndex.message}</p>}
                     </div>
 
                     <div className='space-y-2'>

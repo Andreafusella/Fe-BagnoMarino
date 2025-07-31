@@ -26,9 +26,9 @@ import z from 'zod'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useCreateCategory, type INewCategory } from '@/service/DashboardService'
-import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query'
+import { Loader } from 'lucide-react'
 
 interface INewCategoryDialogProps {
     categories: ICategory[];
@@ -38,16 +38,22 @@ interface INewCategoryDialogProps {
 const categorySchema = z.object({
     name: z.string().min(1, "Il nome è obbligatorio"),
     icon: z.string().min(1, "L'icona è obbligatoria"),
-    orderIndex: z.number().gt(0, "La posizione deve essere maggiore di 0"),
-    subCategoryId: z.number().nullable()
+    orderIndex: z.preprocess(
+        (val) => {
+            if (val === "" || val === undefined || val === null || (typeof val === 'number' && isNaN(val))) {
+                return null;
+            }
+            return Number(val);
+        },
+        z.number().gt(0, "La posizione deve essere maggiore di 0").nullable()
+    ),
+    subCategoryId: z.number().nullable(),
 })
 
 type CategoryFormData = z.infer<typeof categorySchema>
 
-const NewCategoryDialog = ({categories, onCategoryCreated} : INewCategoryDialogProps) => {
+const NewCategoryDialog = ({ categories, onCategoryCreated }: INewCategoryDialogProps) => {
     const [open, setOpen] = useState(false)
-
-    // const { data: categories = []} = useGetAllCategory()
 
     const { mutate } = useCreateCategory();
 
@@ -57,58 +63,38 @@ const NewCategoryDialog = ({categories, onCategoryCreated} : INewCategoryDialogP
         control,
         reset,
         formState: { errors, isSubmitting, isValid }
-    } = useForm<CategoryFormData>({
+    } = useForm({
         resolver: zodResolver(categorySchema),
-        mode: 'all',
+        mode: 'all' as const,
         defaultValues: {
-            subCategoryId: null,
             name: '',
             icon: 'Pizza',
-            orderIndex: undefined
+            subCategoryId: null,
+            orderIndex: null 
         }
     })
-    
-    const navigate = useNavigate()
+
     const queryClient = useQueryClient();
 
     const onSubmit = async (data: CategoryFormData) => {
         const body: INewCategory = {
             name: data.name,
             icon: data.icon,
-            orderIndex: data.orderIndex,
-            subCategoryId: data.subCategoryId ?? -1
+            ...(data.orderIndex !== null && { orderIndex: data.orderIndex }),
+            subCategoryId: data.subCategoryId ?? -1,
         }
-
 
         mutate(body, {
             onSuccess: () => {
-                
-                toast.success(`Categoria ${body.name} creata con successo`, {style: { backgroundColor: "#22c55e", color: "white" }})
+                toast.success(`Categoria ${body.name} creata con successo`, { style: { backgroundColor: "#22c55e", color: "white" } })
                 setOpen(false)
-                queryClient.invalidateQueries({queryKey: ['category-all']})
+                queryClient.invalidateQueries({ queryKey: ['category-all'] })
                 onCategoryCreated?.();
             },
             onError: () => {
-                toast.error(`Errore creazione Categoria`, {style: { backgroundColor: "red", color: "white" }})
+                toast.error(`Errore creazione Categoria`, { style: { backgroundColor: "red", color: "white" } })
             }
         })
-
-        // try {
-        //     console.log(body);
-
-        //     const response = await createCategory(body)
-
-        //     if (response.status === 201 || response.status === 200) {
-        //         console.log("Categoria creata")
-        //         setOpen(false) 
-        //     }
-        // } catch (error: any) {
-        //     if (axios.isAxiosError(error) && error.response?.status === 403 || error.response?.status === 401) {
-        //         navigate("/login")
-        //     } else {
-        //         console.log("Errore generico", error)
-        //     }
-        // }
     }
 
     const handleOpenChange = (isOpen: boolean) => {
@@ -118,7 +104,14 @@ const NewCategoryDialog = ({categories, onCategoryCreated} : INewCategoryDialogP
                 subCategoryId: null,
                 name: '',
                 icon: 'Pizza',
-                orderIndex: NaN
+                orderIndex: null, 
+            })
+        } else {
+            reset({
+                subCategoryId: null,
+                name: '',
+                icon: 'Pizza',
+                orderIndex: null,
             })
         }
     }
@@ -143,9 +136,9 @@ const NewCategoryDialog = ({categories, onCategoryCreated} : INewCategoryDialogP
                                 type="text"
                                 placeholder="Nome categoria"
                                 autoComplete="off"
-
                                 className={`border ${errors.name ? 'border-red-500' : 'border-gray-400'} w-full`}
                             />
+                            {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
                         </div>
 
                         <div className="w-20 space-y-2">
@@ -194,21 +187,31 @@ const NewCategoryDialog = ({categories, onCategoryCreated} : INewCategoryDialogP
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Posizione<span className='text-red-400'>*</span></Label>
+                        <Label>Posizione</Label>
                         <Input
-                            {...register('orderIndex', { valueAsNumber: true })}
+                            id="orderIndex"
+                            {...register('orderIndex')}
                             type='number'
-                            autoComplete="new-password"
+                            autoComplete="off"
                             placeholder='1-2-3...'
-                            className={`border ${errors.orderIndex ? 'border-red-500' : 'border-gray-400'} w-full`}
+                            className={`border ${errors.orderIndex ? 'border-red-500' : 'border-gray-400'} w-full rounded-md p-2`}
                         />
+                        {errors.orderIndex && <p className="text-red-500 text-sm">{errors.orderIndex.message}</p>}
                     </div>
 
                     <DialogFooter className="flex justify-end gap-2">
                         <DialogClose asChild>
                             <Button className='rounded-lg bg-white hover:bg-gray-100 cursor-pointer text-black border border-gray-500'>Cancel</Button>
                         </DialogClose>
-                        <Button disabled={isSubmitting || !isValid} className='rounded-lg bg-blue-500 hover:bg-blue-600 cursor-pointer' type="submit">Save</Button>
+                        <Button disabled={isSubmitting || !isValid} className='rounded-lg bg-blue-500 hover:bg-blue-600 cursor-pointer' type="submit">
+                            {isSubmitting ? (
+                                <div className='flex justify-center items-center'>
+                                    <Loader className="animate-spin" />
+                                </div>
+                            ) : (
+                                <h1>Crea</h1>
+                            )}
+                        </Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
