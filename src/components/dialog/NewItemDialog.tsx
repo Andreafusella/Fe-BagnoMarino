@@ -24,24 +24,22 @@ const productSchema = z.object({
     name: z.string().min(1, "Il nome è obbligatorio").max(30, "Massimo 30 caratteri"),
     price: z.preprocess(
         (val) => {
-            // Gestisce stringhe vuote, undefined, null o NaN per il prezzo
             if (val === "" || val === undefined || val === null || (typeof val === 'number' && isNaN(val))) {
                 return undefined;
             }
             return Number(val);
         },
-        z.number().gt(0, "Il prezzo deve essere maggiore di 0")
+        z.number("Il valore non è valido").gt(0, "Il prezzo deve essere maggiore di 0")
     ),
     category: z.number().min(1, "La categoria è obbligatoria"),
     description: z.string().max(40, "Massimo 40 caratteri").optional(),
     allergenes: z.array(z.number()).optional(),
     orderIndex: z.preprocess(
         (val) => {
-            // Se il valore è una stringa vuota, undefined, null o NaN, restituisce null
+
             if (val === "" || val === undefined || val === null || (typeof val === 'number' && isNaN(val))) {
                 return null;
             }
-            // Altrimenti prova a convertire in numero
             return Number(val);
         },
         z.number().gt(0, "La posizione deve essere maggiore di 0").nullable()
@@ -58,9 +56,10 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
     const [selectedAllergenes, setSelectedAllergenes] = useState<IAllergenesDto[]>([])
     const [selectValue, setSelectValue] = useState<string>("")
     const [open, setOpen] = useState(false)
+    const [errorItem, setErrorItem] = useState("")
 
     const { mutate } = useCreateItem();
-    
+
 
     const {
         register,
@@ -113,25 +112,29 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                 available: false,
                 special: false,
                 frozen: false,
+
             })
             setSelectedAllergenes([])
             setSelectValue("")
+            setErrorItem("")
         }
     }
 
 
     const onSubmit = async (data: ProductFormData) => {
-        const payload : INewItem = {
+        const payload: INewItem = {
             ...data,
             allergensIds: selectedAllergenes.map(a => a.id),
             orderIndex: data.orderIndex
         }
-        
+
         mutate(payload, {
             onSuccess: () => {
-                toast.success(`Item ${payload.name} creato con successo`, {style: { backgroundColor: "#22c55e", color: "white" }})
+                toast.success(`Item ${payload.name} creato con successo`, { style: { backgroundColor: "#22c55e", color: "white" } })
                 setOpen(false)
-
+            },
+            onError: (error: any) => {
+                setErrorItem(error)
             }
         })
     }
@@ -334,6 +337,14 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                                 </div>
                             )}
                         />
+
+                        {errorItem && (
+                            <div className="flex justify-center my-4">
+                                <div className="px-4 py-2 border border-red-500 rounded-2xl bg-white text-center text-red-500 font-semibold max-w-full sm:max-w-[90%] md:max-w-[70%] lg:max-w-[50%] break-words">
+                                    {errorItem}
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <DialogFooter>
                         <DialogClose asChild>

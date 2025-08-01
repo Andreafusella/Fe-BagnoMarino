@@ -54,6 +54,7 @@ type CategoryFormData = z.infer<typeof categorySchema>
 
 const NewCategoryDialog = ({ categories, onCategoryCreated }: INewCategoryDialogProps) => {
     const [open, setOpen] = useState(false)
+    const [errorCategory, setErrorCategory] = useState("")
 
     const { mutate } = useCreateCategory();
 
@@ -70,7 +71,7 @@ const NewCategoryDialog = ({ categories, onCategoryCreated }: INewCategoryDialog
             name: '',
             icon: 'Pizza',
             subCategoryId: null,
-            orderIndex: null 
+            orderIndex: null
         }
     })
 
@@ -91,8 +92,9 @@ const NewCategoryDialog = ({ categories, onCategoryCreated }: INewCategoryDialog
                 queryClient.invalidateQueries({ queryKey: ['category-all'] })
                 onCategoryCreated?.();
             },
-            onError: () => {
+            onError: (error: any) => {
                 toast.error(`Errore creazione Categoria`, { style: { backgroundColor: "red", color: "white" } })
+                setErrorCategory(error)
             }
         })
     }
@@ -104,7 +106,7 @@ const NewCategoryDialog = ({ categories, onCategoryCreated }: INewCategoryDialog
                 subCategoryId: null,
                 name: '',
                 icon: 'Pizza',
-                orderIndex: null, 
+                orderIndex: null,
             })
         } else {
             reset({
@@ -114,6 +116,7 @@ const NewCategoryDialog = ({ categories, onCategoryCreated }: INewCategoryDialog
                 orderIndex: null,
             })
         }
+        setErrorCategory("")
     }
 
     return (
@@ -198,6 +201,14 @@ const NewCategoryDialog = ({ categories, onCategoryCreated }: INewCategoryDialog
                         />
                         {errors.orderIndex && <p className="text-red-500 text-sm">{errors.orderIndex.message}</p>}
                     </div>
+
+                    {errorCategory && (
+                        <div className="flex justify-center my-4">
+                            <div className="px-4 py-2 border border-red-500 rounded-2xl bg-white text-center text-red-500 font-semibold max-w-full sm:max-w-[90%] md:max-w-[70%] lg:max-w-[50%] break-words">
+                                {errorCategory}
+                            </div>
+                        </div>
+                    )}
 
                     <DialogFooter className="flex justify-end gap-2">
                         <DialogClose asChild>

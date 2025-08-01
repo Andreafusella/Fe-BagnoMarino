@@ -229,7 +229,7 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-@layer base {
+/* @layer base {
   :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
     h1 {
       font-family: var(--font-heading);
@@ -288,7 +288,7 @@
       line-height: 1.5;
     }
   }
-}
+} */
 
 .glass-card {
   background: rgba(255, 255, 255, 0.85);

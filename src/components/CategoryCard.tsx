@@ -28,9 +28,9 @@ function CategoryCard({ title, icon, selected, onClick, iconColor }: ICategoryCa
     >
 
       <IconComponent className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 ${iconColor} mb-2`} />
-      <h3 className="text-sm sm:text-base md:text-base font-semibold hover:font-bold mt-2 leading-tight text-blue-900 drop-shadow-sm text-primary-color">
+      <h1 className="text-sm sm:text-base md:text-base font-semibold hover:font-bold mt-2 leading-tight text-blue-900 drop-shadow-sm text-primary-color">
         {title}
-      </h3>
+      </h1>
     </div>
   );
 }

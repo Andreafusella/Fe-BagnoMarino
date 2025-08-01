@@ -63,12 +63,5 @@ export const useGetCategoryWithSubItems = (categoryId: number | null) => {
       },
       enabled: !!categoryId,
     });
-  };
-
-// export async function getCategoryWithSubItems(categoryId: number): Promise<ICategoryWithItems> {
-//     const response = await axios.get<ICategoryWithItems>(`${VITE_BACKEND_URL}/item/categories/${categoryId}`);
-//     console.log(response);
-    
-//     return response.data;
-// }
+};
 

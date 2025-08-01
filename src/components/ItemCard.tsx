@@ -14,7 +14,7 @@ function ItemCard({ item }: ItemCardProps) {
       <div className="flex justify-between items-start gap-4">
         <div className="space-y-2 sm:space-y-3 max-w-[75%]">
           <div className="flex gap-2">
-            <h3 className="text-xl sm:text-2xl font-semibold">{item.name}</h3>
+            <h1 className="text-xl sm:text-2xl font-semibold">{item.name}</h1>
             {item.special && <SpecialCard></SpecialCard>}
             {item.frozen && <FrozenCard></FrozenCard>}
           </div>
@@ -26,7 +26,6 @@ function ItemCard({ item }: ItemCardProps) {
         </p>
       </div>
 
-      {/* Allergens section */}
       { item.allergenes.length > 0 && (
         <div className="flex flex-col sm:flex-row sm:flex-wrap gap-1 sm:gap-2 mt-4 items-start sm:items-center">
           <h1 className="text-sm sm:text-base font-bold">Allergeni:</h1>

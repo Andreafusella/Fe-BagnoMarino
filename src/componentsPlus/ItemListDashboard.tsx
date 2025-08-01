@@ -8,8 +8,8 @@ const ItemListDashboard = () => {
 
     return (
         <div>
-            {allItem?.map((item) => (
-                <CardItemDashboard item={item}/>
+            {allItem?.map((item, index) => (
+                <CardItemDashboard key={index} item={item}/>
             ))}
         </div>
     )

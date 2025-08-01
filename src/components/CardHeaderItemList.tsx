@@ -23,9 +23,9 @@ const CardHeaderItemList = ({ category, numberPlate }: ICardHeaderItemListProps)
                     <IconComponent className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
                 </div>
 
-                <h3 className="text-xl lg:text-2xl font-medium text-[#264653] leading-tight">
+                <h1 className="text-xl lg:text-2xl font-medium text-[#264653] leading-tight">
                     {category!.name}
-                </h3>
+                </h1>
 
                 <div className="text-white border-0 px-4 lg:px-4 py-2 lg:py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-[#2a9d8f] to-[#219ebc]">
                     {numberPlate} piatti
