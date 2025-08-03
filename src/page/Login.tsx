@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Loader2, Lock, User, Waves } from 'lucide-react'
+import { Loader2, Lock, User, UserX, Waves } from 'lucide-react'
 import { useLogin } from '@/service/AuthService'
+import { useState } from 'react'
 
 const loginSchema = z.object({
     email: z.string().min(1, "Email obbligatoria").email("Email non valida"),
@@ -17,6 +18,7 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 const Login = () => {
     const login = useLogin()
+    const [invalidCredential, setInvalidCredential] = useState(false)
 
     const {
         register,
@@ -31,7 +33,7 @@ const Login = () => {
         try {
             await login(data)
         } catch {
-            alert("Credenziali non valide")
+            setInvalidCredential(true)
         } finally {
         }
     }
@@ -84,6 +86,13 @@ const Login = () => {
                                 </div>
                                 {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
                             </div>
+
+                            {invalidCredential && 
+                            <div className='flex gap-2 items-center justify-center mt-6'>
+                                <UserX className='text-red-400'/>
+                                <h1 className='text-red-400'>Credenziali non valide</h1>
+                            </div>    
+                            }
 
                         </CardContent>
                         <CardFooter>

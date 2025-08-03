@@ -1,26 +1,29 @@
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog'
-import { Button } from '../ui/button'
-import { useCreateItem, type IAllergenesDto, type INewItem } from '@/service/DashboardService'
-import type { ICategory } from '@/service/Menuservice'
-import { Textarea } from '../ui/textarea'
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog'
+import { DialogDescription } from '@radix-ui/react-dialog'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { Controller, useForm, type Resolver } from 'react-hook-form'
 import { Switch } from '../ui/switch'
-import { useState } from 'react'
 import Allergen from '../Allergen'
+import { Button } from '../ui/button'
+import { Textarea } from '../ui/textarea'
+import { useGetItemById, useUpdateItem, type IAllergenesDto } from '@/service/DashboardService'
 import z from 'zod'
-import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import type { ICategory } from '@/service/Menuservice'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-interface INewItemDialogProps {
-    allergenes: IAllergenesDto[];
-    categories: ICategory[];
-    onCategoryCreated?: () => void;
+interface IUpdateItemDialogProps {
+    id: number
+    open: boolean
+    setOpen: () => void
+    allergenes?: IAllergenesDto[];
+    categories?: ICategory[];
 }
 
-const productSchema = z.object({
+const itemUpdateSchema = z.object({
     name: z.string().min(1, "Il nome è obbligatorio").max(30, "Massimo 30 caratteri"),
     price: z.preprocess(
         (val) => {
@@ -33,7 +36,7 @@ const productSchema = z.object({
     ),
     category: z.number().min(1, "La categoria è obbligatoria"),
     description: z.string().max(100, "Massimo 100 caratteri").optional(),
-    allergenes: z.array(z.number()).optional(),
+    allergensIds: z.array(z.number()).optional(),
     orderIndex: z.preprocess(
         (val) => {
 
@@ -42,49 +45,64 @@ const productSchema = z.object({
             }
             return Number(val);
         },
-        z.number().gt(0, "La posizione deve essere maggiore di 0").nullable()
+        z.number().gt(-1, "La posizione deve essere maggiore di -1").nullable()
     ),
     available: z.boolean(),
     special: z.boolean(),
     frozen: z.boolean()
 })
 
-type ProductFormData = z.infer<typeof productSchema>
+export type ItemFormData = z.infer<typeof itemUpdateSchema>
 
-const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
+const UpdateItemDialog = ({ id, open, setOpen, allergenes, categories }: IUpdateItemDialogProps) => {
 
+    const { data: item, refetch } = useGetItemById(id)
+    const { mutate : updateItemMutation} = useUpdateItem()
+    
     const [selectedAllergenes, setSelectedAllergenes] = useState<IAllergenesDto[]>([])
     const [selectValue, setSelectValue] = useState<string>("")
-    const [open, setOpen] = useState(false)
     const [errorItem, setErrorItem] = useState("")
-
-    const { mutate } = useCreateItem();
-
-
+    
     const {
         register,
         handleSubmit,
         control,
         reset,
         formState: { errors, isSubmitting, isValid }
-    } = useForm({
-        resolver: zodResolver(productSchema),
-        mode: 'all' as const,
-        defaultValues: {
-            name: '',
-            price: undefined,
-            category: undefined,
-            description: '',
-            orderIndex: null,
-            allergenes: [],
-            available: false,
-            special: false,
-            frozen: false,
-        }
+    } = useForm<z.infer<typeof itemUpdateSchema>>({
+        resolver: zodResolver(itemUpdateSchema) as Resolver<z.infer<typeof itemUpdateSchema>>,
+        mode: 'all',
     })
 
+    useEffect(() => {
+        if (open) {
+            refetch();
+        }
+    }, [open, refetch]);
+
+    useEffect(() => {
+        if (open && item) {
+            reset({
+                name: item.name,
+                price: item.price,
+                category: Number(categories?.find(c => c.name === item.categoryName)?.id),
+                description: item.description,
+                allergensIds: item.allergenes.map(a => a.id),
+                orderIndex: item.orderIndex,
+                available: item.available,
+                special: item.special,
+                frozen: item.frozen
+            })
+            setSelectedAllergenes(item.allergenes)
+        } else if (!open) {
+            reset();
+            setSelectedAllergenes([]);
+            setErrorItem("");
+        }
+    }, [item, categories, reset, open])
+
     const handleAddAllergene = (id: number) => {
-        const allergene = allergenes.find(a => a.id === id)
+        const allergene = allergenes?.find(a => a.id === id)
         if (allergene && !selectedAllergenes.some(a => a.id === id)) {
             setSelectedAllergenes(prev => [...prev, allergene])
             setSelectValue("")
@@ -99,77 +117,36 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
         })
     }
 
-    const handleOpenChange = (isOpen: boolean) => {
-        setOpen(isOpen)
-        if (!isOpen) {
-            reset({
-                name: '',
-                price: undefined,
-                category: undefined,
-                description: '',
-                orderIndex: null,
-                allergenes: [],
-                available: false,
-                special: false,
-                frozen: false,
-
-            })
-            setSelectedAllergenes([])
-            setSelectValue("")
-            setErrorItem("")
-        }
-    }
-
-
-    const onSubmit = async (data: ProductFormData) => {
-        const payload: INewItem = {
-            ...data,
-            allergensIds: selectedAllergenes.map(a => a.id),
-            orderIndex: data.orderIndex
-        }
-
-        mutate(payload, {
+    const onSubmit = async (data: ItemFormData) => {
+        const payload = { id, ...data };
+    
+        updateItemMutation(payload, {
             onSuccess: () => {
-                toast.success(`Item ${payload.name} creato con successo`, { style: { backgroundColor: "#22c55e", color: "white" } })
-                setOpen(false)
-                reset({
-                    name: '',
-                    price: undefined,
-                    category: undefined,
-                    description: '',
-                    orderIndex: null,
-                    allergenes: [],
-                    available: false,
-                    special: false,
-                    frozen: false,
-                })
+                toast.success(`${data.name} aggiornato con successo`, {style: { backgroundColor: "#22c55e", color: "white" }});
+                setOpen();
             },
             onError: (error: any) => {
                 const backendMessage =
                     error?.response?.data?.errors?.[0]?.errorMessage;
-            
+    
                 const fallbackMessage =
                     error?.message || "Errore sconosciuto";
-            
+    
                 setErrorItem(backendMessage || fallbackMessage);
                 console.error(error);
             }
-        })
-    }
-
+        });
+    };
 
     return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogTrigger asChild>
-                <Button className='rounded-lg bg-blue-400 hover:bg-blue-500 cursor-pointer'>+ Piatto</Button>
-            </DialogTrigger>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Crea Item</DialogTitle>
+                    <DialogTitle>Modifica item</DialogTitle>
                     <DialogDescription></DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                     {/* Nome */}
                     <div className='space-y-2'>
                         <Label>Nome<span className='text-red-400'>*</span></Label>
@@ -183,7 +160,6 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                         {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
                     </div>
 
-                    {/* Categoria + Prezzo */}
                     <div className='flex items-center space-x-4'>
                         {/* Categoria */}
                         <div className='space-y-2 flex-1'>
@@ -201,7 +177,7 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
-                                                {categories.map((c) => (
+                                                {categories?.map((c) => (
                                                     <SelectItem key={c.id} value={String(c.id)}>
                                                         {c.name}
                                                     </SelectItem>
@@ -229,7 +205,6 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                         </div>
                     </div>
 
-                    {/* Descrizione */}
                     <div className='space-y-2'>
                         <Label>Descrizione</Label>
                         <Textarea
@@ -256,7 +231,7 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                         <Label>Allergeni</Label>
                         <Controller
                             control={control}
-                            name="allergenes"
+                            name="allergensIds"
                             defaultValue={[]}
                             render={({ field }) => (
                                 <>
@@ -272,8 +247,7 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
-                                                {allergenes
-                                                    .filter(a => !field.value?.includes(a.id))
+                                                {allergenes?.filter(a => !field.value?.includes(a.id))
                                                     .map(a => (
                                                         <SelectItem key={a.id} value={String(a.id)}>
                                                             <span className="flex items-center gap-2">
@@ -366,7 +340,7 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                     </div>
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button className='rounded-lg bg-white hover:bg-gray-100 cursor-pointer text-black border border-gray-500'>Cancel</Button>
+                            <Button onClick={() => setOpen()} type='button' className='rounded-lg bg-white hover:bg-gray-100 cursor-pointer text-black border border-gray-500'>Cancel</Button>
                         </DialogClose>
                         <Button
                             type="submit"
@@ -377,10 +351,9 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                         </Button>
                     </DialogFooter>
                 </form>
-
             </DialogContent>
         </Dialog>
     )
 }
 
-export default NewItemDialog
+export default UpdateItemDialog

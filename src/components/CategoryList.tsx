@@ -42,15 +42,14 @@ const CategoryList = ({ categories }: ICategoryListProps) => {
 
     return (
         <div className="mb-2 lg:mb-4">
-            <div className="mx-4 lg:mx-8 px-4 lg:px-6 pt-10 pb-0 lg:pt-12 lg:pb-6">
+            <div className="mx-4 lg:mx-8 px-0 lg:px-6 pt-10 pb-0 lg:pt-12 lg:pb-6">
                 <div ref={ref} className="overflow-x-auto py-6 lg:pb-6 no-scrollbar">
-                    <div className="flex gap-4 lg:gap-5 min-w-max px-6 lg:px-12">
+                    <div className="flex gap-4 lg:gap-5 min-w-max px-8 sm:px-10 lg:px-12">
                         {categories.map((category, index) => (
                             <CategoryCard
                                 key={category.id}
                                 title={category.name}
                                 icon={category.icon}
-                                numberPlate={index + 1}
                                 selected={selectedCategory?.id === category.id}
                                 onClick={() => handleCategoryClick(category)}
                                 iconColor={categoryColors[category.id]}

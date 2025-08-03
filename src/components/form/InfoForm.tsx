@@ -72,7 +72,7 @@ const InfoForm = () => {
         return <p className="text-sm text-red-500">{message}</p>;
     };
 
-    if (isLoading || !info) {
+    if (isLoading) {
         return (
             <div className="mt-10 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm space-y-6 animate-pulse">
                 {[...Array(4)].map((_, i) => (

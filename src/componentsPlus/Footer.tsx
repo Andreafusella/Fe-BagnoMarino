@@ -1,7 +1,11 @@
+import type { IInfoData } from "@/service/DashboardService"
 import { Phone, MapPin, Clock, Waves, Anchor } from "lucide-react"
 
+interface IFooterProps {
+    infoRestaurant?: IInfoData
+}
 
-const Footer = () => {
+const Footer = ({infoRestaurant} : IFooterProps) => {
     return (
         <footer className="bg-slate-900/95 backdrop-blur-sm text-white relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-ocean-900/30 to-teal-900/30"></div>
@@ -34,15 +38,15 @@ const Footer = () => {
                         <div className="space-y-4 lg:space-y-6 text-slate-300">
                             <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
                                 <MapPin className="w-4 h-4 lg:w-5 lg:h-5 text-ocean-400 flex-shrink-0" />
-                                <span className="text-sm lg:text-base">Lungomare Europa - Martinsicuro (TE)</span>
+                                <span className="text-sm lg:text-base">{infoRestaurant?.address}</span>
                             </div>
                             <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
                                 <Phone className="w-4 h-4 lg:w-5 lg:h-5 text-ocean-400 flex-shrink-0" />
-                                <span className="text-sm lg:text-base">+39 329 328 3319</span>
+                                <span className="text-sm lg:text-base">{infoRestaurant?.phone}</span>
                             </div>
                             <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
                                 <Clock className="w-4 h-4 lg:w-5 lg:h-5 text-ocean-400 flex-shrink-0" />
-                                <span className="text-sm lg:text-base">08:00-00:00</span>
+                                <span className="text-sm lg:text-base">{infoRestaurant?.openingTime} - {infoRestaurant?.closingTime}</span>
                             </div>
                         </div>
                     </div>

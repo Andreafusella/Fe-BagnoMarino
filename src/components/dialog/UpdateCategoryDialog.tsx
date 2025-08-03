@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { Button } from '../ui/button'
 import {
     Dialog,
     DialogClose,
@@ -7,12 +8,9 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger
 } from '../ui/dialog'
-import { Button } from '../ui/button'
-import { Label } from '../ui/label'
 import { Input } from '../ui/input'
-import type { ICategory } from '@/service/Menuservice'
+import { Label } from '../ui/label'
 import {
     Select,
     SelectTrigger,
@@ -21,18 +19,18 @@ import {
     SelectGroup,
     SelectItem
 } from '../ui/select'
-import IconPicker from '../IconPicker'
 import z from 'zod'
-import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useCreateCategory, type INewCategory } from '@/service/DashboardService'
-import { toast } from 'sonner';
-import { useQueryClient } from '@tanstack/react-query'
+import type { ICategory } from '@/service/Menuservice'
+import IconPicker from '../IconPicker'
+import { useState } from 'react'
 import { Loader } from 'lucide-react'
 
-interface INewCategoryDialogProps {
-    categories: ICategory[];
-    onCategoryCreated?: () => void;
+interface IUpdateCategoryDialogProps {
+    id: number
+    open: boolean
+    setOpen: () => void
+    categories?: ICategory[];
 }
 
 const categorySchema = z.object({
@@ -50,13 +48,11 @@ const categorySchema = z.object({
     subCategoryId: z.number().nullable(),
 })
 
-type CategoryFormData = z.infer<typeof categorySchema>
+type CategoryUpdateFormData = z.infer<typeof categorySchema>
 
-const NewCategoryDialog = ({ categories, onCategoryCreated }: INewCategoryDialogProps) => {
-    const [open, setOpen] = useState(false)
+const UpdateCategoryDialog = ({id, open, setOpen, categories} : IUpdateCategoryDialogProps) => {
+
     const [errorCategory, setErrorCategory] = useState("")
-
-    const { mutate } = useCreateCategory();
 
     const {
         register,
@@ -75,64 +71,18 @@ const NewCategoryDialog = ({ categories, onCategoryCreated }: INewCategoryDialog
         }
     })
 
-    const queryClient = useQueryClient();
+    
 
-    const onSubmit = async (data: CategoryFormData) => {
-        const body: INewCategory = {
-            name: data.name,
-            icon: data.icon,
-            ...(data.orderIndex !== null && { orderIndex: data.orderIndex }),
-            subCategoryId: data.subCategoryId ?? -1,
-        }
-
-        mutate(body, {
-            onSuccess: () => {
-                toast.success(`Categoria ${body.name} creata con successo`, { style: { backgroundColor: "#22c55e", color: "white" } })
-                setOpen(false)
-                queryClient.invalidateQueries({ queryKey: ['category-all'] })
-                onCategoryCreated?.();
-            },
-            onError: (error: any) => {
-                const backendMessage =
-                    error?.response?.data?.errors?.[0]?.errorMessage;
-            
-                const fallbackMessage =
-                    error?.message || "Errore sconosciuto";
-            
-                    setErrorCategory(backendMessage || fallbackMessage);
-                console.error(error);
-            }
-        })
-    }
-
-    const handleOpenChange = (isOpen: boolean) => {
-        setOpen(isOpen)
-        if (!isOpen) {
-            reset({
-                subCategoryId: null,
-                name: '',
-                icon: 'Pizza',
-                orderIndex: null,
-            })
-        } else {
-            reset({
-                subCategoryId: null,
-                name: '',
-                icon: 'Pizza',
-                orderIndex: null,
-            })
-        }
-        setErrorCategory("")
+    const onSubmit = async (data: CategoryUpdateFormData) => {
+        console.log(JSON.stringify(data));
+        
     }
 
     return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogTrigger asChild>
-                <Button className='rounded-lg bg-blue-400 hover:bg-blue-500 cursor-pointer'>+ Categoria</Button>
-            </DialogTrigger>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Crea Categoria</DialogTitle>
+                    <DialogTitle>Aggiorna Categoria</DialogTitle>
                     <DialogDescription></DialogDescription>
                 </DialogHeader>
 
@@ -182,7 +132,7 @@ const NewCategoryDialog = ({ categories, onCategoryCreated }: INewCategoryDialog
                                     <SelectContent>
                                         <SelectGroup>
                                             <SelectItem value="null">No</SelectItem>
-                                            {categories.map((c) => (
+                                            {categories?.map((c) => (
                                                 <SelectItem key={c.id} value={String(c.id)}>
                                                     {c.name}
                                                 </SelectItem>
@@ -236,4 +186,4 @@ const NewCategoryDialog = ({ categories, onCategoryCreated }: INewCategoryDialog
     )
 }
 
-export default NewCategoryDialog
+export default UpdateCategoryDialog

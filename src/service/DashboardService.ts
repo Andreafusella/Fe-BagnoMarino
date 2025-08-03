@@ -3,6 +3,7 @@ import type { ICategory } from "./Menuservice";
 import { createAuthInstance } from "@/api/axiosInstance";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { InfoFormData } from "@/components/form/InfoForm";
+import type { ItemFormData } from "@/components/dialog/UpdateItemDialog";
 
 export interface INewCategory {
     name: string;
@@ -43,6 +44,12 @@ export interface IItemWithCategoryDto {
     items: IItemDto[];
 }
 
+export interface IPlateCategoryInfo {
+    category: number;
+    itemAvailable: number;
+    itemNotAvailable: number;
+}
+
 export interface IAllergenesDto {
     id: number;
     symbol: string;
@@ -75,7 +82,6 @@ export interface IInfoData {
 const getItemWithCategory = async (token : string): Promise<IItemWithCategoryDto[]> => {
     const authAxios = createAuthInstance(token);
     const response = await authAxios.get<IItemWithCategoryDto[]>('/item')
-    console.log(response.data);
     
     return response.data; 
 }
@@ -155,6 +161,7 @@ export const useCreateCategory = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['category-all']})
             queryClient.invalidateQueries({queryKey: ['item-category-all']})
+            queryClient.invalidateQueries({queryKey: ['get-info-plate-category']})
         }
     })
 }
@@ -180,6 +187,7 @@ export const useCreateItem = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['item-category-all']})
+            queryClient.invalidateQueries({queryKey: ['get-info-plate-category']})
         }
     })
 }
@@ -205,6 +213,7 @@ export const useUpdateAvailableItem = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['category-tree']})
             queryClient.invalidateQueries({queryKey: ['item-category-all']})
+            queryClient.invalidateQueries({queryKey: ['get-info-plate-category']})
         }
     })
 }
@@ -225,6 +234,29 @@ export const useUpdatePositionItem = () => {
                 throw new Error('No token available for fetching update-position-item')
             }
             return updatePositionItem(token, data)
+        },
+        onSuccess: () => {
+            
+        }
+    })
+}
+
+const updatePositionCategory = async (token: string, data: IUpdatePosition[]): Promise<void> => {
+    const authAxios = createAuthInstance(token);
+    const response = await authAxios.put<void>('/category/position', data);
+    return response.data;
+}
+
+export const useUpdatePositionCategory = () => {
+    const token = localStorage.getItem("token");
+
+    return useMutation({
+        mutationKey: ['update-position-category'],
+        mutationFn: async (data: IUpdatePosition[]) => {
+            if (!token) {
+                throw new Error('No token available for fetching update-position-category')
+            }
+            return updatePositionCategory(token, data)
         },
         onSuccess: () => {
             
@@ -302,6 +334,7 @@ export const useDeleteItem = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['item-category-all']})
+            queryClient.invalidateQueries({queryKey: ['get-info-plate-category']})
         }
     })
 }
@@ -328,9 +361,85 @@ export const useDeleteCategory = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['item-category-all']})
+            queryClient.invalidateQueries({queryKey: ['get-info-plate-category']})
         }
     })
 }
+
+const getItemById = async (token: string, id: number): Promise<IItemDto> => {
+    const authAxios = createAuthInstance(token);
+    const response = await authAxios.get<IItemDto>(`item/${id}`);
+
+    return response.data
+}
+
+export const useGetItemById = (id: number) => {
+    const token = localStorage.getItem("token");
+
+    const queryClient = useQueryClient();
+
+    return useQuery({
+        queryKey: ['get-item-by-id', id],
+        queryFn: async () => {
+            if (!token) {
+                throw new Error('No token available for fetching get-item-by-id')
+            }
+            return getItemById(token, id)
+        },
+        enabled: !!id
+    })
+}
+
+const updateItem = async (token: string, data : ItemFormData): Promise<void> => {
+    const authAxios = createAuthInstance(token);
+    const response = await authAxios.put<void>(`item`, data);
+
+    return response.data
+}
+
+export const useUpdateItem = () => {
+    const token = localStorage.getItem("token");
+
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationKey: ['update-item'],
+        mutationFn: async (data: ItemFormData) => {
+            if (!token) {
+                throw new Error('No token available for fetching update-item')
+            }
+            return updateItem(token, data)
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['item-category-all']})
+            queryClient.invalidateQueries({queryKey: ['get-info-plate-category']})
+        }
+    })
+}
+
+const getInfoPlateCategoryRestaurant = async (token: string): Promise<IPlateCategoryInfo> => {
+    const authAxios = createAuthInstance(token)
+    const response = await authAxios.get<IPlateCategoryInfo>('/restaurant/number')
+    console.log(response.data);
+    
+    return response.data;
+}
+
+export const useGetInfoPlateCategoryRestaurant = () => {
+    const token = localStorage.getItem("token");
+    
+    return useQuery({
+        queryKey: ['get-info-plate-category'],
+        queryFn: async () => {
+            if (!token) {
+                throw new Error('No token available for fetching get-info-plate-category')
+            }
+            return getInfoPlateCategoryRestaurant(token);
+        }
+    })
+}
+
+
 
 
 export const ICONS = [

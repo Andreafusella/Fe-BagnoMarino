@@ -17,7 +17,7 @@ export function useLogin() {
 
       const token = response.data.token
       localStorage.setItem("token", token)
-      navigate("/dashboard-admin")
+      navigate("/dashboard-menu")
     } catch (error) {
       console.error("Login fallito", error)
       throw error

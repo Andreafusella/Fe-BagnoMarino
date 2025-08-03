@@ -18,7 +18,6 @@ const AuthLayout = () => {
       <div className="flex w-full">
         <AppSidebar />
         <main className="flex-1 overflow-y-auto">
-          <SidebarTrigger />
           <Outlet />
         </main>
       </div>

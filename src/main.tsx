@@ -21,7 +21,7 @@ createRoot(document.getElementById('root')!).render(
             </MenuProvider>
           </AuthProvider>
         </BrowserRouter>
-      </StrictMode>,
+      </StrictMode>
     </QueryClientProvider>
   </>
 )

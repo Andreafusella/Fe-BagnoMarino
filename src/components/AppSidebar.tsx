@@ -1,4 +1,4 @@
-import { Home, Calendar, Settings } from "lucide-react"
+import { HandPlatter, Settings } from "lucide-react"
 
 import {
     Sidebar,
@@ -9,18 +9,27 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    useSidebar,
 } from "@/components/ui/sidebar"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
+import { useEffect } from "react"
 
 const items = [
-    { title: "Dashboard", icon: Home, url: "/dashboard-admin" },
-    { title: "Gestione Menù", icon: Calendar, url: "/dashboard-menu" },
+    { title: "Gestione Menù", icon: HandPlatter, url: "/dashboard-menu" },
     { title: "Informazioni", icon: Settings, url: "/dashboard-info" },
 ]
 
 export function AppSidebar() {
+
+    const location = useLocation()
+    const { setOpenMobile } = useSidebar()
+
+    useEffect(() => {
+        setOpenMobile(false) 
+    }, [location.pathname, setOpenMobile])
+
     return (
-        <Sidebar>
+        <Sidebar >
             <SidebarHeader>
                 <div className="flex gap-2 items-center">
                     <div className="bg-sky-400 p-1 rounded-xl">

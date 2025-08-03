@@ -1,0 +1,3 @@
+- Ricontrollare gli errori tra front e back
+- Mettere i testi degli errori nel back in italiano
+- Update della categoria
