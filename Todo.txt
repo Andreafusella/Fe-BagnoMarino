@@ -2,8 +2,17 @@
 - Mettere i testi degli errori nel back in italiano
 - Update della categoria
 - Aggiungere skeleton per il loading del footer
--X- fix bug se un titolo è tutto attaccato senza spazi non va acapo e sfonda la card degli item sul menu
 - fix ui se il testo è troppo lungo allora la card dove mostra icona name e piatti si ingrandisce troppo e tocca i bordi
 - fix ui stessa cosa del testo sopra ma per la pagina admin nel titolo della categoria va troppo oltre e sposta tutto
 - Bug controllare nel be alla validazione update category che l'id di parent non sia uguale al suo stesso id
 - Bug a volte nell'update della catgoria non compare il nome della categoria a cui è associatoe in piu il getById non si aggiorna se richiamo lo stesso. Forse perchè essendo lo stesso id non rifa la fetch?
+- bug -> non carica la sotto categoria nelle sub category nell'edit della categoria al primo get nel
+
+
+
+
+Completed:
+
+- fix mettere il loading quando si clicca su l'update per le categorie e per gli item
+- UI loading e disabed nel bottone crea item
+- fix bug se un titolo è tutto attaccato senza spazi non va acapo e sfonda la card degli item sul menu

@@ -53,7 +53,7 @@ const MenuDashboard = () => {
                     </div>
                 </div>
 
-                {/* Stato menu vuoto */}
+                {/* Stato menu vuoto
                 {categoriesNotSub.length === 0 && (
                     <div className="flex items-center justify-center min-h-screen">
                         <div className="text-center space-y-2 p-9 border-2 border-gray-300 rounded-2xl shadow-lg">
@@ -63,7 +63,7 @@ const MenuDashboard = () => {
                             </h1>
                         </div>
                     </div>
-                )}
+                )} */}
             </div>
 
             <div className="px-5">

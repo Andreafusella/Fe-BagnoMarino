@@ -27,6 +27,7 @@ import { useEffect, useState } from 'react'
 import { Loader } from 'lucide-react'
 import { useGetCategoryById, useUpdateCategory } from '@/service/DashboardService'
 import { toast } from 'sonner'
+import DialogSkeleton from '../skeleton/DialogSkeleton'
 
 interface IUpdateCategoryDialogProps {
     id: number
@@ -55,16 +56,17 @@ const UpdateCategoryDialog = ({ id, open, setOpen }: IUpdateCategoryDialogProps)
 
     const [errorCategory, setErrorCategory] = useState("")
 
-    const { data: category } = useGetCategoryById(id);
-    const { data: allCategories } = useGetCategoriesNotSubCategory()
-    const { mutate: updateCategoryMutate } = useUpdateCategory()
+    const { data: category, isLoading: loadingCategory } = useGetCategoryById(id);
+    const { data: allCategories, isLoading: loadingCategoryNotSub } = useGetCategoriesNotSubCategory()
+    const { mutate: updateCategoryMutate, isPending } = useUpdateCategory()
 
+    const loading : boolean = loadingCategory || loadingCategoryNotSub
     const {
         register,
         handleSubmit,
         control,
         reset,
-        formState: { errors, isSubmitting, isValid }
+        formState: { errors, isValid }
     } = useForm({
         resolver: zodResolver(categorySchema),
         mode: 'all' as const,
@@ -117,107 +119,119 @@ const UpdateCategoryDialog = ({ id, open, setOpen }: IUpdateCategoryDialogProps)
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Aggiorna Categoria</DialogTitle>
-                    <DialogDescription></DialogDescription>
-                </DialogHeader>
+                {loading ? (
+                    <>
+                        <DialogHeader>
+                            <DialogTitle></DialogTitle>
+                        </DialogHeader>
+                        <DialogSkeleton />
+                    </>
+                ) : (
+                    <>
+                    
+                        <DialogHeader>
+                            <DialogTitle>Aggiorna Categoria</DialogTitle>
+                            <DialogDescription></DialogDescription>
+                        </DialogHeader>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    <div className="flex items-center space-x-4">
-                        <div className="flex-1 space-y-2">
-                            <Label>Nome<span className='text-red-400'>*</span></Label>
-                            <Input
-                                {...register('name')}
-                                type="text"
-                                placeholder="Nome categoria"
-                                autoComplete="off"
-                                className={`border ${errors.name ? 'border-red-500' : 'border-gray-400'} w-full`}
-                            />
-                            {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
-                        </div>
-
-                        <div className="w-20 space-y-2">
-                            <Label>Icona<span className='text-red-400'>*</span></Label>
-                            <Controller
-                                control={control}
-                                name="icon"
-                                render={({ field }) => (
-                                    <IconPicker
-                                        selectedIcon={field.value}
-                                        onChange={field.onChange}
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                            <div className="flex items-center space-x-4">
+                                <div className="flex-1 space-y-2">
+                                    <Label>Nome<span className='text-red-400'>*</span></Label>
+                                    <Input
+                                        {...register('name')}
+                                        type="text"
+                                        placeholder="Nome categoria"
+                                        autoComplete="off"
+                                        className={`border ${errors.name ? 'border-red-500' : 'border-gray-400'} w-full`}
                                     />
-                                )}
-                            />
-                            {errors.icon && <p className="text-red-500 text-sm">{errors.icon.message}</p>}
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label>Sotto-Categoria</Label>
-                        <Controller
-                            control={control}
-                            name="subCategoryId"
-                            render={({ field }) => (
-                                <Select
-                                    onValueChange={(val) => field.onChange(val === "null" ? null : Number(val))}
-                                    value={field.value === null ? "null" : String(field.value)}
-                                >
-                                    <SelectTrigger className="border border-gray-400 w-full">
-                                        <SelectValue placeholder="Seleziona una categoria" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectGroup>
-                                            <SelectItem value="null">No</SelectItem>
-                                            {allCategories
-                                                ?.filter((c) => c.id !== id).map((c) => (
-                                                    <SelectItem key={c.id} value={String(c.id)}>
-                                                        {c.name}
-                                                    </SelectItem>
-                                                ))}
-                                        </SelectGroup>
-                                    </SelectContent>
-                                </Select>
-                            )}
-                        />
-                        {errors.subCategoryId && <p className="text-red-500 text-sm">{errors.subCategoryId.message}</p>}
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label>Posizione</Label>
-                        <Input
-                            id="orderIndex"
-                            {...register('orderIndex')}
-                            type='number'
-                            autoComplete="off"
-                            placeholder='1-2-3...'
-                            className={`border ${errors.orderIndex ? 'border-red-500' : 'border-gray-400'} w-full rounded-md p-2`}
-                        />
-                        {errors.orderIndex && <p className="text-red-500 text-sm">{errors.orderIndex.message}</p>}
-                    </div>
-
-                    {errorCategory && (
-                        <div className="flex justify-center my-4">
-                            <div className="px-4 py-2 border border-red-500 rounded-2xl bg-white text-center text-red-500 font-semibold max-w-full sm:max-w-[90%] md:max-w-[70%] lg:max-w-[50%] break-words">
-                                {errorCategory}
-                            </div>
-                        </div>
-                    )}
-
-                    <DialogFooter className="flex justify-end gap-2">
-                        <DialogClose asChild>
-                            <Button className='rounded-lg bg-white hover:bg-gray-100 cursor-pointer text-black border border-gray-500'>Cancel</Button>
-                        </DialogClose>
-                        <Button disabled={isSubmitting || !isValid} className='rounded-lg bg-blue-500 hover:bg-blue-600 cursor-pointer' type="submit">
-                            {isSubmitting ? (
-                                <div className='flex justify-center items-center'>
-                                    <Loader className="animate-spin" />
+                                    {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
                                 </div>
-                            ) : (
-                                <h1>Aggiorna</h1>
+
+                                <div className="w-20 space-y-2">
+                                    <Label>Icona<span className='text-red-400'>*</span></Label>
+                                    <Controller
+                                        control={control}
+                                        name="icon"
+                                        render={({ field }) => (
+                                            <IconPicker
+                                                selectedIcon={field.value}
+                                                onChange={field.onChange}
+                                            />
+                                        )}
+                                    />
+                                    {errors.icon && <p className="text-red-500 text-sm">{errors.icon.message}</p>}
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Sotto-Categoria</Label>
+                                <Controller
+                                    control={control}
+                                    name="subCategoryId"
+                                    render={({ field }) => (
+                                        <Select
+                                            onValueChange={(val) => field.onChange(val === "null" ? null : Number(val))}
+                                            value={field.value === null ? "null" : String(field.value)}
+                                        >
+                                            <SelectTrigger className="border border-gray-400 w-full">
+                                                <SelectValue placeholder="Seleziona una categoria" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectItem value="null">No</SelectItem>
+                                                    {allCategories
+                                                        ?.filter((c) => c.id !== id).map((c) => (
+                                                            <SelectItem key={c.id} value={String(c.id)}>
+                                                                {c.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                    )}
+                                />
+                                {errors.subCategoryId && <p className="text-red-500 text-sm">{errors.subCategoryId.message}</p>}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Posizione</Label>
+                                <Input
+                                    id="orderIndex"
+                                    {...register('orderIndex')}
+                                    type='number'
+                                    autoComplete="off"
+                                    placeholder='1-2-3...'
+                                    className={`border ${errors.orderIndex ? 'border-red-500' : 'border-gray-400'} w-full rounded-md p-2`}
+                                />
+                                {errors.orderIndex && <p className="text-red-500 text-sm">{errors.orderIndex.message}</p>}
+                            </div>
+
+                            {errorCategory && (
+                                <div className="flex justify-center my-4">
+                                    <div className="px-4 py-2 border border-red-500 rounded-2xl bg-white text-center text-red-500 font-semibold max-w-full sm:max-w-[90%] md:max-w-[70%] lg:max-w-[50%] break-words">
+                                        {errorCategory}
+                                    </div>
+                                </div>
                             )}
-                        </Button>
-                    </DialogFooter>
-                </form>
+
+                            <DialogFooter className="flex justify-end gap-2">
+                                <DialogClose asChild>
+                                    <Button className='rounded-lg bg-white hover:bg-gray-100 cursor-pointer text-black border border-gray-500'>Cancel</Button>
+                                </DialogClose>
+                                <Button disabled={isPending || !isValid} className='rounded-lg bg-blue-500 hover:bg-blue-600 cursor-pointer' type="submit">
+                                    {isPending ? (
+                                        <div className='flex justify-center items-center'>
+                                            <Loader className="animate-spin" />
+                                        </div>
+                                    ) : (
+                                        <h1>Aggiorna</h1>
+                                    )}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    </>
+                )}
             </DialogContent>
         </Dialog>
     )

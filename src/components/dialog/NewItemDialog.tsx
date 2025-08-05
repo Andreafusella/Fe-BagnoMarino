@@ -13,6 +13,7 @@ import z from 'zod'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
+import { Loader } from 'lucide-react'
 
 interface INewItemDialogProps {
     allergenes: IAllergenesDto[];
@@ -58,7 +59,7 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
     const [open, setOpen] = useState(false)
     const [errorItem, setErrorItem] = useState("")
 
-    const { mutate } = useCreateItem();
+    const { mutate, isPending } = useCreateItem();
 
 
     const {
@@ -66,7 +67,7 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
         handleSubmit,
         control,
         reset,
-        formState: { errors, isSubmitting, isValid }
+        formState: { errors, isValid }
     } = useForm({
         resolver: zodResolver(productSchema),
         mode: 'all' as const,
@@ -369,10 +370,17 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                         </DialogClose>
                         <Button
                             type="submit"
-                            disabled={isSubmitting || !isValid}
+                            disabled={isPending || !isValid}
                             className="rounded-lg bg-blue-500 hover:bg-blue-600 cursor-pointer"
                         >
-                            Save
+                            {isPending ? (
+                                <div className='flex justify-center items-center'>
+                                    <Loader className="animate-spin h-4 w-4" />
+                                </div>
+                            ) : (
+                                <h1>Crea</h1>
+                            )}
+                            
                         </Button>
                     </DialogFooter>
                 </form>

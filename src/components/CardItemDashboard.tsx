@@ -34,6 +34,7 @@ import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Dia
 import type { ICategory } from "@/service/Menuservice";
 import { DragHandleDots2Icon } from "@radix-ui/react-icons";
 import UpdateCategoryDialog from "./dialog/UpdateCategoryDialog";
+import UpdateItemDialog from "./dialog/UpdateItemDialog";
 
 interface ICardItemDashboardProps {
     item: IItemWithCategoryDto;
@@ -96,6 +97,8 @@ const CardItemDashboard = ({
     onDelete,
     onDeleteItem,
     onReorder,
+    allergens,
+    categories
 }: ICardItemDashboardProps) => {
     const IconComponent = getLucideIconByName(item.categoryIcon);
 
@@ -108,8 +111,8 @@ const CardItemDashboard = ({
     const [openDeleteItemDialog, setOpenDeleteItemDialog] = useState<boolean>(false);
     const [openDeleteCategoryDialog, setOpenDeleteCategoryDialog] = useState<boolean>(false);
     const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
-    const [, setOpenUpdateItemDialog] = useState<boolean>(false);
-    const [, setEditItemId] = useState<number | null>(null);
+    const [openUpdateItemDialog, setOpenUpdateItemDialog] = useState<boolean>(false);
+    const [editItemId, setEditItemId] = useState<number | null>(null);
     const [editCategoryId, setEditCategoryId] = useState<number | null>(null);
     const [openUpdateCategoryDialog, setOpenUpdateCategoryDialog] = useState(false);
 
@@ -242,6 +245,19 @@ const CardItemDashboard = ({
                         setOpenUpdateCategoryDialog(false);
                         setEditCategoryId(null);
                     }}
+                />
+            )}
+
+            {editItemId !== null && (
+                <UpdateItemDialog
+                    id={editItemId}
+                    open={openUpdateItemDialog}
+                    setOpen={(val?: boolean) => {
+                        setOpenUpdateItemDialog(val ?? false);
+                        setEditItemId(null);
+                    }}
+                    allergenes={allergens}
+                    categories={categories}
                 />
             )}
 

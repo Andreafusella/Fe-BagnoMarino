@@ -56,14 +56,14 @@ const NewCategoryDialog = ({ categories, onCategoryCreated }: INewCategoryDialog
     const [open, setOpen] = useState(false)
     const [errorCategory, setErrorCategory] = useState("")
 
-    const { mutate } = useCreateCategory();
+    const { mutate, isPending } = useCreateCategory();
 
     const {
         register,
         handleSubmit,
         control,
         reset,
-        formState: { errors, isSubmitting, isValid }
+        formState: { errors, isValid }
     } = useForm({
         resolver: zodResolver(categorySchema),
         mode: 'all' as const,
@@ -220,8 +220,8 @@ const NewCategoryDialog = ({ categories, onCategoryCreated }: INewCategoryDialog
                         <DialogClose asChild>
                             <Button className='rounded-lg bg-white hover:bg-gray-100 cursor-pointer text-black border border-gray-500'>Cancel</Button>
                         </DialogClose>
-                        <Button disabled={isSubmitting || !isValid} className='rounded-lg bg-blue-500 hover:bg-blue-600 cursor-pointer' type="submit">
-                            {isSubmitting ? (
+                        <Button disabled={isPending || !isValid} className='rounded-lg bg-blue-500 hover:bg-blue-600 cursor-pointer' type="submit">
+                            {isPending ? (
                                 <div className='flex justify-center items-center'>
                                     <Loader className="animate-spin" />
                                 </div>
