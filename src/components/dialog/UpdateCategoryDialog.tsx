@@ -21,16 +21,17 @@ import {
 } from '../ui/select'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { ICategory } from '@/service/Menuservice'
+import { useGetCategoriesNotSubCategory } from '@/service/Menuservice'
 import IconPicker from '../IconPicker'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Loader } from 'lucide-react'
+import { useGetCategoryById, useUpdateCategory } from '@/service/DashboardService'
+import { toast } from 'sonner'
 
 interface IUpdateCategoryDialogProps {
     id: number
     open: boolean
     setOpen: () => void
-    categories?: ICategory[];
 }
 
 const categorySchema = z.object({
@@ -43,16 +44,20 @@ const categorySchema = z.object({
             }
             return Number(val);
         },
-        z.number().gt(0, "La posizione deve essere maggiore di 0").nullable()
+        z.number().gt(-1, "La posizione deve essere maggiore di -1").nullable()
     ),
     subCategoryId: z.number().nullable(),
 })
 
-type CategoryUpdateFormData = z.infer<typeof categorySchema>
+export type CategoryUpdateFormData = z.infer<typeof categorySchema>
 
-const UpdateCategoryDialog = ({id, open, setOpen, categories} : IUpdateCategoryDialogProps) => {
+const UpdateCategoryDialog = ({ id, open, setOpen }: IUpdateCategoryDialogProps) => {
 
     const [errorCategory, setErrorCategory] = useState("")
+
+    const { data: category } = useGetCategoryById(id);
+    const { data: allCategories } = useGetCategoriesNotSubCategory()
+    const { mutate: updateCategoryMutate } = useUpdateCategory()
 
     const {
         register,
@@ -71,11 +76,42 @@ const UpdateCategoryDialog = ({id, open, setOpen, categories} : IUpdateCategoryD
         }
     })
 
-    
+    useEffect(() => {
+        if (category) {
+            reset({
+                name: category.name,
+                icon: category.icon,
+                subCategoryId: category.subCategoryId ?? null,
+                orderIndex: category.orderIndex ?? null,
+            });
+        }
+    }, [category, reset]);
+
 
     const onSubmit = async (data: CategoryUpdateFormData) => {
         console.log(JSON.stringify(data));
-        
+
+        const payload = {
+            ...data,
+            id: id,
+            subCategoryId: data.subCategoryId === null ? -1 : data.subCategoryId
+        };
+
+        updateCategoryMutate(payload, {
+            onSuccess: () => {
+                toast.success(`Categoria aggiornata con successo!`, { style: { backgroundColor: "#22c55e", color: "white" } })
+                setOpen()
+            },
+            onError: (error: any) => {
+                const backendMessage =
+                    error?.response?.data?.errors?.[0]?.errorMessage;
+
+                const fallbackMessage =
+                    error?.message || "Errore sconosciuto";
+
+                setErrorCategory(backendMessage || fallbackMessage);
+            }
+        });
     }
 
     return (
@@ -132,11 +168,12 @@ const UpdateCategoryDialog = ({id, open, setOpen, categories} : IUpdateCategoryD
                                     <SelectContent>
                                         <SelectGroup>
                                             <SelectItem value="null">No</SelectItem>
-                                            {categories?.map((c) => (
-                                                <SelectItem key={c.id} value={String(c.id)}>
-                                                    {c.name}
-                                                </SelectItem>
-                                            ))}
+                                            {allCategories
+                                                ?.filter((c) => c.id !== id).map((c) => (
+                                                    <SelectItem key={c.id} value={String(c.id)}>
+                                                        {c.name}
+                                                    </SelectItem>
+                                                ))}
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
@@ -176,7 +213,7 @@ const UpdateCategoryDialog = ({id, open, setOpen, categories} : IUpdateCategoryD
                                     <Loader className="animate-spin" />
                                 </div>
                             ) : (
-                                <h1>Crea</h1>
+                                <h1>Aggiorna</h1>
                             )}
                         </Button>
                     </DialogFooter>

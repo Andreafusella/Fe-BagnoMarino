@@ -31,9 +31,9 @@ import { CSS } from "@dnd-kit/utilities";
 import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogContent, DialogClose } from "./ui/dialog";
-import UpdateItemDialog from "./dialog/UpdateItemDialog";
 import type { ICategory } from "@/service/Menuservice";
 import { DragHandleDots2Icon } from "@radix-ui/react-icons";
+import UpdateCategoryDialog from "./dialog/UpdateCategoryDialog";
 
 interface ICardItemDashboardProps {
     item: IItemWithCategoryDto;
@@ -93,12 +93,9 @@ const SortableItem = ({
 
 const CardItemDashboard = ({
     item,
-    onEdit,
     onDelete,
     onDeleteItem,
     onReorder,
-    allergens,
-    categories,
 }: ICardItemDashboardProps) => {
     const IconComponent = getLucideIconByName(item.categoryIcon);
 
@@ -111,8 +108,10 @@ const CardItemDashboard = ({
     const [openDeleteItemDialog, setOpenDeleteItemDialog] = useState<boolean>(false);
     const [openDeleteCategoryDialog, setOpenDeleteCategoryDialog] = useState<boolean>(false);
     const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
-    const [openUpdateItemDialog, setOpenUpdateItemDialog] = useState<boolean>(false);
-    const [editItemId, setEditItemId] = useState<number | null>(null);
+    const [, setOpenUpdateItemDialog] = useState<boolean>(false);
+    const [, setEditItemId] = useState<number | null>(null);
+    const [editCategoryId, setEditCategoryId] = useState<number | null>(null);
+    const [openUpdateCategoryDialog, setOpenUpdateCategoryDialog] = useState(false);
 
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: item.categoryId
@@ -187,10 +186,10 @@ const CardItemDashboard = ({
         setOpenUpdateItemDialog(true);
     };
 
-    const handleCloseUpdateItemDialog = () => {
-        setOpenUpdateItemDialog(false);
-        setEditItemId(null);
-    };
+    // const handleCloseUpdateItemDialog = () => {
+    //     setOpenUpdateItemDialog(false);
+    //     setEditItemId(null);
+    // };
 
     const handleConfirmDeleteItem = () => {
         if (selectedItemId) {
@@ -235,13 +234,14 @@ const CardItemDashboard = ({
 
     return (
         <>
-            {editItemId && (
-                <UpdateItemDialog
-                    id={editItemId}
-                    open={openUpdateItemDialog}
-                    setOpen={handleCloseUpdateItemDialog}
-                    allergenes={allergens}
-                    categories={categories}
+            {editCategoryId !== null && (
+                <UpdateCategoryDialog
+                    id={editCategoryId}
+                    open={openUpdateCategoryDialog}
+                    setOpen={() => {
+                        setOpenUpdateCategoryDialog(false);
+                        setEditCategoryId(null);
+                    }}
                 />
             )}
 
@@ -320,11 +320,14 @@ const CardItemDashboard = ({
                 <div className="flex items-center justify-between border-b pb-2">
                     <div className="flex items-center gap-3">
                         <IconComponent className="h-7 w-7 text-gray-600" />
-                        <h2 className="text-lg font-semibold text-gray-800">{item.category}</h2>
+                        <h2 className="text-lg font-semibold text-gray-800 break-all pr-2">{item.category}</h2>
                     </div>
                     <div className="flex gap-2">
                         <Button
-                            onClick={() => onEdit?.(item.categoryId)}
+                            onClick={() => {
+                                setEditCategoryId(item.categoryId);
+                                setOpenUpdateCategoryDialog(true);
+                            }}
                             className="text-gray-600 hover:text-blue-600 bg-transparent hover:bg-gray-200 border border-gray-300 transition-colors cursor-pointer"
                         >
                             <Pencil className="h-5 w-5" />

@@ -1,6 +1,6 @@
 import type { IItem } from "@/service/Menuservice";
 import Allergen from "./Allergen";
-import { Flame, Snowflake, Sparkles } from "lucide-react";
+import { Snowflake, Sparkles } from "lucide-react";
 
 interface ItemCardProps {
   item: IItem;
@@ -12,7 +12,7 @@ function ItemCard({ item }: ItemCardProps) {
       {/* Top section */}
       <div className="flex justify-between items-start gap-4">
         <div className="space-y-2 sm:space-y-3 max-w-[75%]">
-          <h1 className="text-xl sm:text-2xl font-semibold">{item.name}</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold break-all">{item.name}</h1>
           <p className="text-sm sm:text-[15px] text-gray-600">{item.description}</p>
         </div>
         <p className="text-2xl sm:text-3xl font-bold text-cyan-800 font-poppins whitespace-nowrap">

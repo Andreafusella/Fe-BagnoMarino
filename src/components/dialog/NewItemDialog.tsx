@@ -152,7 +152,6 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
                     error?.message || "Errore sconosciuto";
             
                 setErrorItem(backendMessage || fallbackMessage);
-                console.error(error);
             }
         })
     }

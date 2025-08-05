@@ -4,11 +4,20 @@ import { createAuthInstance } from "@/api/axiosInstance";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { InfoFormData } from "@/components/form/InfoForm";
 import type { ItemFormData } from "@/components/dialog/UpdateItemDialog";
+import type { CategoryUpdateFormData } from "@/components/dialog/UpdateCategoryDialog";
 
 export interface INewCategory {
     name: string;
     icon: string;
     orderIndex?: number | null;
+    subCategoryId: number
+}
+
+export interface ICategoryDto {
+    id: number;
+    name: string;
+    icon: string;
+    orderIndex: number;
     subCategoryId: number
 }
 
@@ -267,7 +276,6 @@ export const useUpdatePositionCategory = () => {
 const getInfoRestaurant = async (token: string): Promise<IInfoData> => {
     const authAxios = createAuthInstance(token);
     const response = await authAxios.get<IInfoData>('/restaurant');
-    console.log(response.data);
     
     return response.data;
 }
@@ -376,8 +384,6 @@ const getItemById = async (token: string, id: number): Promise<IItemDto> => {
 export const useGetItemById = (id: number) => {
     const token = localStorage.getItem("token");
 
-    const queryClient = useQueryClient();
-
     return useQuery({
         queryKey: ['get-item-by-id', id],
         queryFn: async () => {
@@ -420,7 +426,6 @@ export const useUpdateItem = () => {
 const getInfoPlateCategoryRestaurant = async (token: string): Promise<IPlateCategoryInfo> => {
     const authAxios = createAuthInstance(token)
     const response = await authAxios.get<IPlateCategoryInfo>('/restaurant/number')
-    console.log(response.data);
     
     return response.data;
 }
@@ -435,6 +440,56 @@ export const useGetInfoPlateCategoryRestaurant = () => {
                 throw new Error('No token available for fetching get-info-plate-category')
             }
             return getInfoPlateCategoryRestaurant(token);
+        }
+    })
+}
+
+const getCategoryById = async (token: string, id: number): Promise<ICategoryDto> => {
+    const authAxios = createAuthInstance(token)
+    const response = await authAxios.get<ICategoryDto>(`/category/${id}`)
+    
+    return response.data;
+}
+
+export const useGetCategoryById = (id: number) => {
+    const token = localStorage.getItem("token");
+
+    return useQuery({
+        queryKey: ['get-category-by-id', id],
+        queryFn: async () => {
+            if (!token) {
+                throw new Error('No token available for fetching get-info-plate-category')
+            }
+            return getCategoryById(token, id);
+        },
+        enabled: !!id
+    })
+}
+
+const updateCategory = async (token: string, data: CategoryUpdateFormData): Promise<void> => {
+    const authAxios = createAuthInstance(token)
+    console.log(data);
+    
+    const response = await authAxios.put<void>(`/category`, data)
+    
+    return response.data;
+}
+
+export const useUpdateCategory = () => {
+    const token = localStorage.getItem("token");
+
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationKey: ['update-category'],
+        mutationFn: async (data: CategoryUpdateFormData) => {
+            if (!token) {
+                throw new Error('No token available for fetching update-category')
+            }
+            return updateCategory(token, data)
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['item-category-all']})
+            queryClient.invalidateQueries({queryKey: ['category-all']})
         }
     })
 }

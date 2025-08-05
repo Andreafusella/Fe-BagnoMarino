@@ -2,12 +2,13 @@ import NewCategoryDialog from "@/components/dialog/NewCategoryDialog"
 import NewItemDialog from "@/components/dialog/NewItemDialog"
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import ItemListDashboard from "@/componentsPlus/ItemListDashboard";
-import { useGetAllergenesAdmin, useGetInfoPlateCategoryRestaurant } from "@/service/DashboardService"
+import { useGetAllCategory, useGetAllergenesAdmin, useGetInfoPlateCategoryRestaurant } from "@/service/DashboardService"
 import { useGetCategoriesNotSubCategory } from "@/service/Menuservice";
 
 const MenuDashboard = () => {
 
-    const { data: categories = [], refetch } = useGetCategoriesNotSubCategory();
+    const { data: categoriesNotSub = [], refetch } = useGetCategoriesNotSubCategory();
+    const { data: allCategories = [] } = useGetAllCategory();
     const { data: allergenes = [] } = useGetAllergenesAdmin();
     const { data: infoPlateCategory } = useGetInfoPlateCategoryRestaurant()
 
@@ -41,19 +42,19 @@ const MenuDashboard = () => {
                     {/* Bottoni */}
                     <div className="flex flex-col sm:flex-row gap-2">
                         <NewCategoryDialog
-                            categories={categories}
+                            categories={categoriesNotSub}
                             onCategoryCreated={refetch}
                         />
                         <NewItemDialog
                             allergenes={allergenes}
-                            categories={categories}
+                            categories={allCategories}
                             onCategoryCreated={refetch}
                         />
                     </div>
                 </div>
 
                 {/* Stato menu vuoto */}
-                {categories.length === 0 && (
+                {categoriesNotSub.length === 0 && (
                     <div className="flex items-center justify-center min-h-screen">
                         <div className="text-center space-y-2 p-9 border-2 border-gray-300 rounded-2xl shadow-lg">
                             <h1 className="sm:text-xl md:text-3xl font-semibold">Menu vuoto</h1>
