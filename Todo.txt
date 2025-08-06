@@ -4,6 +4,7 @@
 - fix ui se il testo è troppo lungo allora la card dove mostra icona name e piatti si ingrandisce troppo e tocca i bordi
 - fix ui stessa cosa del testo sopra ma per la pagina admin nel titolo della categoria va troppo oltre e sposta tutto
 - Bug controllare nel be alla validazione update category che l'id di parent non sia uguale al suo stesso id
+- alla creazione di un item non elimina nel dialog la lista degli allergeni e il prezzo
 
 
 Completed:
