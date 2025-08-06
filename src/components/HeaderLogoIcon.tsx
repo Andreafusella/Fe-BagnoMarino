@@ -10,7 +10,7 @@ const HeaderLogoIcon = () => {
                 <div className="relative group">
                     <div className="logo-hero-container w-32 h-32 lg:w-40 lg:h-40 rounded-4xl p-2 transition-deliveroo-slow">
                         <img
-                            src="/public/logo.png"
+                            src="/logo.png"
                             className="w-full h-full object-contain relative z-10"
                         />
                     </div>

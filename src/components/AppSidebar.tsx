@@ -33,7 +33,7 @@ export function AppSidebar() {
             <SidebarHeader>
                 <div className="flex gap-2 items-center">
                     <div className="bg-sky-400 p-1 rounded-xl">
-                        <img src="/public/logoIcon.png" alt="" className="h-10" />
+                        <img src="/logoIcon.png" alt="" className="h-10" />
                     </div>
                     <div>
                         <h1 className="font-semibold">Bagno Marino</h1>
