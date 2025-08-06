@@ -15,17 +15,18 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import {
     DndContext,
-    closestCenter,
+    closestCorners,
     PointerSensor,
     useSensor,
     useSensors,
+    TouchSensor,
     type DragEndEvent,
 } from "@dnd-kit/core";
 import {
     arrayMove,
     SortableContext,
     useSortable,
-    verticalListSortingStrategy,
+    rectSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useState, useEffect } from "react";
@@ -66,11 +67,15 @@ const SortableItem = ({
     };
 
     return (
-        <div ref={setNodeRef} style={style as React.CSSProperties} className={`relative ${isDragging ? "shadow-lg" : ""}`}>
+        <div 
+            ref={setNodeRef} 
+            style={style as React.CSSProperties} 
+            className={`relative`}
+        >
             <div
                 {...attributes}
                 {...listeners}
-                className="absolute top-10 right-2 cursor-grab text-gray-400 hover:text-gray-600"
+                className="absolute top-10 right-2 cursor-grab text-gray-400 hover:text-gray-600 z-10"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -91,6 +96,7 @@ const SortableItem = ({
         </div>
     );
 };
+
 
 const CardItemDashboard = ({
     item,
@@ -124,6 +130,8 @@ const CardItemDashboard = ({
         transform: CSS.Transform.toString(transform),
         transition,
         zIndex: isDragging ? 10 : "auto",
+        width: isDragging ? 'auto' : undefined,
+        minHeight: isDragging ? 'auto' : undefined,
     };
 
     useEffect(() => {
@@ -131,12 +139,18 @@ const CardItemDashboard = ({
     }, [item.items]);
 
     const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 8,
-            },
-        })
-    );
+    useSensor(PointerSensor, {
+        activationConstraint: {
+            distance: 8,
+        },
+    }),
+    useSensor(TouchSensor, { // Aggiungi questo
+        activationConstraint: {
+            delay: 200,
+            tolerance: 8,
+        },
+    })
+);
 
     const handleToggleAvailability = (itemId: number, newValue: boolean) => {
         const data: IChangeAvailableBodyDto = {
@@ -188,11 +202,6 @@ const CardItemDashboard = ({
         setEditItemId(itemId);
         setOpenUpdateItemDialog(true);
     };
-
-    // const handleCloseUpdateItemDialog = () => {
-    //     setOpenUpdateItemDialog(false);
-    //     setEditItemId(null);
-    // };
 
     const handleConfirmDeleteItem = () => {
         if (selectedItemId) {
@@ -364,8 +373,8 @@ const CardItemDashboard = ({
                     </div>
                 </div>
 
-                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                    <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+                <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
+                    <SortableContext items={items.map((i) => i.id)} strategy={rectSortingStrategy}>
                         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                             {items.map((i) => (
                                 <SortableItem

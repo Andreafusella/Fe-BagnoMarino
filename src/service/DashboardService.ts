@@ -410,7 +410,7 @@ export const useUpdateItem = () => {
 
     return useMutation({
         mutationKey: ['update-item'],
-        mutationFn: async (data: ItemFormData) => {
+        mutationFn: async (data: ItemFormData & { id: number }) => {
             if (!token) {
                 throw new Error('No token available for fetching update-item')
             }
@@ -419,6 +419,7 @@ export const useUpdateItem = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['item-category-all']})
             queryClient.invalidateQueries({queryKey: ['get-info-plate-category']})
+            queryClient.invalidateQueries({queryKey: ['get-item-by-id']})
         }
     })
 }
@@ -481,15 +482,16 @@ export const useUpdateCategory = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationKey: ['update-category'],
-        mutationFn: async (data: CategoryUpdateFormData) => {
+        mutationFn: async (data: CategoryUpdateFormData & { id: number }) => {
             if (!token) {
                 throw new Error('No token available for fetching update-category')
             }
             return updateCategory(token, data)
         },
-        onSuccess: () => {
+        onSuccess: (_, data) => {
             queryClient.invalidateQueries({queryKey: ['item-category-all']})
             queryClient.invalidateQueries({queryKey: ['category-all']})
+            queryClient.invalidateQueries({queryKey: ['get-category-by-id', data.id]})
         }
     })
 }

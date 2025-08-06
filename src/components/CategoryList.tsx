@@ -45,7 +45,7 @@ const CategoryList = ({ categories }: ICategoryListProps) => {
             <div className="mx-4 lg:mx-8 px-0 lg:px-6 pt-10 pb-0 lg:pt-12 lg:pb-6">
                 <div ref={ref} className="overflow-x-auto py-6 lg:pb-6 no-scrollbar">
                     <div className="flex gap-4 lg:gap-5 min-w-max px-8 sm:px-10 lg:px-12">
-                        {categories.map((category, index) => (
+                        {categories.map((category) => (
                             <CategoryCard
                                 key={category.id}
                                 title={category.name}

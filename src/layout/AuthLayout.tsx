@@ -1,5 +1,5 @@
 import { AppSidebar } from '@/components/AppSidebar'
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { SidebarProvider } from '@/components/ui/sidebar'
 import { useEffect } from 'react'
 import { useNavigate, Outlet } from 'react-router-dom'
 

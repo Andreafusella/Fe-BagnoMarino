@@ -60,7 +60,7 @@ const UpdateCategoryDialog = ({ id, open, setOpen }: IUpdateCategoryDialogProps)
     const { data: allCategories, isLoading: loadingCategoryNotSub } = useGetCategoriesNotSubCategory()
     const { mutate: updateCategoryMutate, isPending } = useUpdateCategory()
 
-    const loading : boolean = loadingCategory || loadingCategoryNotSub
+    const loading: boolean = loadingCategory || loadingCategoryNotSub
     const {
         register,
         handleSubmit,
@@ -79,19 +79,20 @@ const UpdateCategoryDialog = ({ id, open, setOpen }: IUpdateCategoryDialogProps)
     })
 
     useEffect(() => {
-        if (category) {
-            reset({
-                name: category.name,
-                icon: category.icon,
-                subCategoryId: category.subCategoryId ?? null,
-                orderIndex: category.orderIndex ?? null,
-            });
+        if (category && allCategories && !loadingCategoryNotSub) {
+            setTimeout(() => {
+                reset({
+                    name: category.name,
+                    icon: category.icon,
+                    subCategoryId: category.subCategoryId ?? null,
+                    orderIndex: category.orderIndex ?? null,
+                });
+            }, 0);
         }
-    }, [category, reset]);
+    }, [category, allCategories, loadingCategoryNotSub, reset]);
 
 
     const onSubmit = async (data: CategoryUpdateFormData) => {
-        console.log(JSON.stringify(data));
 
         const payload = {
             ...data,
@@ -128,7 +129,7 @@ const UpdateCategoryDialog = ({ id, open, setOpen }: IUpdateCategoryDialogProps)
                     </>
                 ) : (
                     <>
-                    
+
                         <DialogHeader>
                             <DialogTitle>Aggiorna Categoria</DialogTitle>
                             <DialogDescription></DialogDescription>

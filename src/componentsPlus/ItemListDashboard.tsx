@@ -2,9 +2,10 @@ import {
     DndContext,
     closestCenter,
     PointerSensor,
-    useSensor,
+    TouchSensor,
     useSensors,
     type DragEndEvent,
+    useSensor,
 } from "@dnd-kit/core";
 import {
     arrayMove,
@@ -33,7 +34,17 @@ const ItemListDashboard = () => {
     }, [initialItems]);
 
     const sensors = useSensors(
-        useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
+        useSensor(TouchSensor, {
+            activationConstraint: {
+                delay: 200,
+                tolerance: 8,
+            },
+        })
     );
 
     const handleDragEndCategory = (event: DragEndEvent) => {
