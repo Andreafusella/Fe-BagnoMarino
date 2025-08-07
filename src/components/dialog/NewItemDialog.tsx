@@ -22,7 +22,7 @@ interface INewItemDialogProps {
 }
 
 const productSchema = z.object({
-    name: z.string().min(1, "Il nome è obbligatorio").max(30, "Massimo 30 caratteri"),
+    name: z.string().min(1, "Il nome è obbligatorio").max(60, "Massimo 60 caratteri"),
     price: z.preprocess(
         (val) => {
             if (val === "" || val === undefined || val === null || (typeof val === 'number' && isNaN(val))) {
@@ -33,7 +33,7 @@ const productSchema = z.object({
         z.number("Il valore non è valido").gt(0, "Il prezzo deve essere maggiore di 0")
     ),
     category: z.number().min(1, "La categoria è obbligatoria"),
-    description: z.string().max(100, "Massimo 100 caratteri").optional(),
+    description: z.string().max(130, "Massimo 130 caratteri").optional(),
     allergenes: z.array(z.number()).optional(),
     orderIndex: z.preprocess(
         (val) => {

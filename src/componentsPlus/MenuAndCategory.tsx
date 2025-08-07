@@ -17,23 +17,24 @@ const MenuAndCategory = () => {
   } = useGetCategoryWithSubItems(selectedCategory?.id ?? null);
 
   const renderCategoryTree = (category: ICategoryWithItems) => {
-  const shouldRenderCard = category.items.length > 0;
+    const shouldRenderCard = category.items.length > 0;
 
-  return (
-    <div key={category.id}>
-      {shouldRenderCard && (
-        <>
-          <CardHeaderItemList
-            category={{ id: category.id, name: category.name, icon: category.icon }}
-            numberPlate={category.items.length}
-          />
-          <ItemList item={category.items} />
-        </>
-      )}
-      {category.subcategories?.map(renderCategoryTree)}
-    </div>
-  );
-};
+    return (
+      <div key={category.id}>
+        {shouldRenderCard && (
+          <>
+            <CardHeaderItemList
+              category={{ id: category.id, name: category.name, icon: category.icon }}
+              numberPlate={category.items.length}
+            />
+            <ItemList item={category.items} />
+          </>
+        )}
+        {category.subcategories?.map(renderCategoryTree)}
+      </div>
+    );
+  };
+
 
   return (
     <section className="beach-menu-bg pb-20 lg:pb-24 relative">
