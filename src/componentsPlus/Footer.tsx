@@ -1,11 +1,11 @@
-import type { IInfoData } from "@/service/DashboardService"
+import { RestaurantInfoSkeleton } from "@/components/skeleton/RestaurantInfoSkeleton"
+import { useGetInfoNotAdminRestaurant } from "@/service/GeneralService"
 import { Phone, MapPin, Clock, Waves, Anchor } from "lucide-react"
 
-interface IFooterProps {
-    infoRestaurant?: IInfoData
-}
+const Footer = () => {
 
-const Footer = ({infoRestaurant} : IFooterProps) => {
+    const {data: infoRestaurant, isLoading} = useGetInfoNotAdminRestaurant()
+
     return (
         <footer className="bg-slate-900/95 backdrop-blur-sm text-white relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-ocean-900/30 to-teal-900/30"></div>
@@ -35,20 +35,24 @@ const Footer = ({infoRestaurant} : IFooterProps) => {
                             <Phone className="w-5 h-5 lg:w-6 lg:h-6 text-ocean-400" />
                             Contatti
                         </h4>
-                        <div className="space-y-4 lg:space-y-6 text-slate-300">
-                            <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
-                                <MapPin className="w-4 h-4 lg:w-5 lg:h-5 text-ocean-400 flex-shrink-0" />
-                                <span className="text-sm lg:text-base">{infoRestaurant?.address}</span>
+                        {isLoading ? (
+                            <RestaurantInfoSkeleton/>
+                        ) : (
+                            <div className="space-y-4 lg:space-y-6 text-slate-300">
+                                <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
+                                    <MapPin className="w-4 h-4 lg:w-5 lg:h-5 text-ocean-400 flex-shrink-0" />
+                                    <span className="text-sm lg:text-base">{infoRestaurant?.address}</span>
+                                </div>
+                                <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
+                                    <Phone className="w-4 h-4 lg:w-5 lg:h-5 text-ocean-400 flex-shrink-0" />
+                                    <span className="text-sm lg:text-base">{infoRestaurant?.phone}</span>
+                                </div>
+                                <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
+                                    <Clock className="w-4 h-4 lg:w-5 lg:h-5 text-ocean-400 flex-shrink-0" />
+                                    <span className="text-sm lg:text-base">{infoRestaurant?.openingTime} - {infoRestaurant?.closingTime}</span>
+                                </div>
                             </div>
-                            <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
-                                <Phone className="w-4 h-4 lg:w-5 lg:h-5 text-ocean-400 flex-shrink-0" />
-                                <span className="text-sm lg:text-base">{infoRestaurant?.phone}</span>
-                            </div>
-                            <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
-                                <Clock className="w-4 h-4 lg:w-5 lg:h-5 text-ocean-400 flex-shrink-0" />
-                                <span className="text-sm lg:text-base">{infoRestaurant?.openingTime} - {infoRestaurant?.closingTime}</span>
-                            </div>
-                        </div>
+                        )}
                     </div>
 
 

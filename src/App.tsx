@@ -5,6 +5,7 @@ import Login from './page/Login'
 import AuthLayout from './layout/AuthLayout'
 import MenuDashboard from './page/MenuDashboard'
 import InfoDashboard from './page/InfoDashboard'
+import AllergenPage from './page/AllergenPage'
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path='/' element={<Menu />} />
+          <Route path='/allergeni' element={<AllergenPage />} />
         </Route>
 
         <Route path='/login' element={<Login />} />

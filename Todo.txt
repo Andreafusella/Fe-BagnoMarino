@@ -1,6 +1,5 @@
 - Ricontrollare gli errori tra front e back
 - Mettere i testi degli errori nel back in italiano
-- Aggiungere skeleton per il loading del footer
 - fix ui se il testo è troppo lungo allora la card dove mostra icona name e piatti si ingrandisce troppo e tocca i bordi
 - fix ui stessa cosa del testo sopra ma per la pagina admin nel titolo della categoria va troppo oltre e sposta tutto
 - Bug controllare nel be alla validazione update category che l'id di parent non sia uguale al suo stesso id
@@ -14,6 +13,7 @@ Completed:
 - fix bug se un titolo è tutto attaccato senza spazi non va acapo e sfonda la card degli item sul menu
 - bug -> non carica la sotto categoria nelle sub category nell'edit della categoria al primo get nel
 - Bug a volte nell'update della catgoria non compare il nome della categoria a cui è associatoe in piu il getById non si aggiorna se richiamo lo stesso. Forse perchè essendo lo stesso id non rifa la fetch?
+- Aggiungere skeleton per il loading del footer
 
 
 Non risolto:

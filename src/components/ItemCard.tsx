@@ -12,8 +12,8 @@ function ItemCard({ item }: ItemCardProps) {
       {/* Top section */}
       <div className="flex justify-between items-start gap-4">
         <div className="space-y-2 sm:space-y-3 max-w-[75%]">
-          <h1 className="text-xl sm:text-2xl font-semibold break-all">{item.name}</h1>
-          <p className="text-sm sm:text-[15px] text-gray-600">{item.description}</p>
+          <h1 className="text-lg sm:text-2xl font-bold sm:font-semibold break-words">{item.name}</h1>
+          <p className="text-[13px] sm:text-[15px] text-gray-600">{item.description}</p>
         </div>
         <p className="text-2xl sm:text-3xl font-bold text-cyan-800 font-poppins whitespace-nowrap">
           {item.price.toFixed(2)}
