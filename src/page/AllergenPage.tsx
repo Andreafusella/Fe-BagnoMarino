@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Info, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,7 @@ const AllergenPage = () => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     setIsLoaded(true);
     allergens.forEach((_, index) => {
       setTimeout(() => {

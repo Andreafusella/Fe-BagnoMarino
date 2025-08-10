@@ -1,8 +1,7 @@
 import { RestaurantInfoSkeleton } from "@/components/skeleton/RestaurantInfoSkeleton"
 import { useGetInfoNotAdminRestaurant } from "@/service/GeneralService"
 import { InstagramLogoIcon } from "@radix-ui/react-icons"
-import { Phone, MapPin, Clock, Waves, Anchor, Instagram } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Phone, MapPin, Clock, Waves, Anchor } from "lucide-react"
 
 const Footer = () => {
 
