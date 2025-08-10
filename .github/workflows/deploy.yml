@@ -1,0 +1,23 @@
+name: Build and Push Docker Image FrontEnd
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USER }}" --password-stdin
+
+      - name: Build Docker image
+        run: docker build --platform linux/amd64 -t bagnomarinochalet1/bagnomarino-frontend:latest .
+
+      - name: Push Docker image
+        run: docker push bagnomarinochalet1/bagnomarino-frontend:latest

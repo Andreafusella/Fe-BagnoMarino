@@ -13,6 +13,8 @@ const Menu = () => {
             <CopertoAndButtonAllergens/>
             <Footer></Footer>
         </>
+
+        
     )
 }
 
