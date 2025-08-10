@@ -19,6 +19,7 @@ const CopertoAndButtonAllergens = () => {
                 </Button>
             </Link>
         </div>
+        
     )
 }
 
