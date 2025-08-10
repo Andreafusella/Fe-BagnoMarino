@@ -37,7 +37,7 @@ const MenuAndCategory = () => {
 
 
   return (
-    <section className="beach-menu-bg pb-20 lg:pb-24 relative">
+    <section className="beach-menu-bg relative">
       <div className="content-container">
         <CardMenuText />
 

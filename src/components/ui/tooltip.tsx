@@ -21,9 +21,17 @@ function TooltipProvider({
 function Tooltip({
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Root>) {
+  const [open, setOpen] = React.useState(false)
+  const isMobile = typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches
+
   return (
     <TooltipProvider>
-      <TooltipPrimitive.Root data-slot="tooltip" {...props} />
+      <TooltipPrimitive.Root
+        data-slot="tooltip"
+        open={isMobile ? open : undefined}
+        onOpenChange={isMobile ? setOpen : undefined}
+        {...props}
+      />
     </TooltipProvider>
   )
 }
@@ -31,7 +39,17 @@ function Tooltip({
 function TooltipTrigger({
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
+  const isMobile = typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches
+
+  return (
+    <TooltipPrimitive.Trigger
+      data-slot="tooltip-trigger"
+      {...(isMobile
+        ? { onClick: (e) => e.preventDefault() }
+        : {})}
+      {...props}
+    />
+  )
 }
 
 function TooltipContent({
