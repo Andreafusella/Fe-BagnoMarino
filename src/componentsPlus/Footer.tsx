@@ -5,6 +5,8 @@ import { Phone, MapPin, Clock, Waves, Anchor } from "lucide-react"
 const Footer = () => {
 
     const {data: infoRestaurant, isLoading} = useGetInfoNotAdminRestaurant()
+    console.log(infoRestaurant);
+    
 
     return (
         <footer className="bg-slate-900/95 backdrop-blur-sm text-white relative overflow-hidden">

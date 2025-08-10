@@ -10,6 +10,8 @@ const MenuAndCategory = () => {
   const { selectedCategory } = useMenu();
 
   const { data: categories = [], isLoading: loadingCategories } = useGetCategoriesNotSubCategory();
+  console.log(categories);
+  
   const {
     data: categoryTree,
     isLoading: loadingItems,
