@@ -469,7 +469,6 @@ export const useGetCategoryById = (id: number) => {
 
 const updateCategory = async (token: string, data: CategoryUpdateFormData): Promise<void> => {
     const authAxios = createAuthInstance(token)
-    console.log(data);
     
     const response = await authAxios.put<void>(`/category`, data)
     

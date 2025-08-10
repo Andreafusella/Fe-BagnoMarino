@@ -12,7 +12,6 @@ export function getLucideIconByName(iconName: string): LucideIcon {
 const getInfoNotAdminRestaurant = async (): Promise<IInfoData> => {
     const authAxios = createAuthInstance(null)
     const response = await authAxios.get<IInfoData>('/restaurant/info')
-    console.log(response.data);
     
     return response.data;
 }

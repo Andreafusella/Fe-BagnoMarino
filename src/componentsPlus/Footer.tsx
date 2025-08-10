@@ -1,12 +1,12 @@
 import { RestaurantInfoSkeleton } from "@/components/skeleton/RestaurantInfoSkeleton"
 import { useGetInfoNotAdminRestaurant } from "@/service/GeneralService"
-import { Phone, MapPin, Clock, Waves, Anchor } from "lucide-react"
+import { InstagramLogoIcon } from "@radix-ui/react-icons"
+import { Phone, MapPin, Clock, Waves, Anchor, Instagram } from "lucide-react"
+import { Link } from "react-router-dom"
 
 const Footer = () => {
 
-    const {data: infoRestaurant, isLoading} = useGetInfoNotAdminRestaurant()
-    console.log(infoRestaurant);
-    
+    const { data: infoRestaurant, isLoading } = useGetInfoNotAdminRestaurant()
 
     return (
         <footer className="bg-slate-900/95 backdrop-blur-sm text-white relative overflow-hidden">
@@ -28,7 +28,7 @@ const Footer = () => {
                                 <div className="absolute -inset-4 bg-gradient-to-r from-ocean-500/20 via-teal-500/15 to-ocean-500/20 rounded-5xl blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
                             </div>
                         </div>
-                        
+
                     </div>
 
                     {/* Contact Section */}
@@ -38,7 +38,7 @@ const Footer = () => {
                             Contatti
                         </h4>
                         {isLoading ? (
-                            <RestaurantInfoSkeleton/>
+                            <RestaurantInfoSkeleton />
                         ) : (
                             <div className="space-y-4 lg:space-y-6 text-slate-300">
                                 <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
@@ -53,6 +53,12 @@ const Footer = () => {
                                     <Clock className="w-4 h-4 lg:w-5 lg:h-5 text-ocean-400 flex-shrink-0" />
                                     <span className="text-sm lg:text-base">{infoRestaurant?.openingTime} - {infoRestaurant?.closingTime}</span>
                                 </div>
+                                <a href="https://www.instagram.com/bagnomarino_official?igsh=MXgxcjV1NXR6dDFhMg==" target="_blank" rel="noopener noreferrer">
+                                    <div className="flex items-center justify-center lg:justify-start gap-3 lg:gap-4">
+                                        <InstagramLogoIcon className="w-4 h-4 lg:w-5 lg:h-5 text-ocean-400 flex-shrink-0" />
+                                        <span className="text-sm lg:text-base underline">bagnomarino_official</span>
+                                    </div>
+                                </a>
                             </div>
                         )}
                     </div>
