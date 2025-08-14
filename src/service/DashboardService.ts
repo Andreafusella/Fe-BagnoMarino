@@ -343,6 +343,7 @@ export const useDeleteItem = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['item-category-all']})
             queryClient.invalidateQueries({queryKey: ['get-info-plate-category']})
+            queryClient.invalidateQueries({queryKey: ['category-all']})
         }
     })
 }

@@ -131,6 +131,7 @@ const NewItemDialog = ({ allergenes, categories }: INewItemDialogProps) => {
 
         mutate(payload, {
             onSuccess: () => {
+                window.location.reload();
                 toast.success(`Item ${payload.name} creato con successo`, { style: { backgroundColor: "#22c55e", color: "white" } })
                 setOpen(false)
                 reset({

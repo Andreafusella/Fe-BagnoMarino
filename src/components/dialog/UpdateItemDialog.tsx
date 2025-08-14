@@ -70,7 +70,7 @@ const UpdateItemDialog = ({ id, open, setOpen, allergenes, categories }: IUpdate
         handleSubmit,
         control,
         reset,
-        formState: { errors, isValid }
+        formState: { errors }
     } = useForm<z.infer<typeof itemUpdateSchema>>({
         resolver: zodResolver(itemUpdateSchema) as Resolver<z.infer<typeof itemUpdateSchema>>,
         mode: 'all',
@@ -360,7 +360,7 @@ const UpdateItemDialog = ({ id, open, setOpen, allergenes, categories }: IUpdate
                                 </DialogClose>
                                 <Button
                                     type="submit"
-                                    disabled={isPending || !isValid}
+                                    disabled={isPending}
                                     className="rounded-lg bg-blue-500 hover:bg-blue-600 cursor-pointer"
                                 >
                                     {isPending ? (
